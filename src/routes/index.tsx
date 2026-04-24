@@ -1,26 +1,171 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import { ArrowRight, Shield, Clock, Users, Star, CheckCircle2, MessageCircle, Phone } from "lucide-react";
+import hero1 from "@/assets/hero-1.jpg";
+import hero2 from "@/assets/hero-2.jpg";
+import hero3 from "@/assets/hero-3.jpg";
+import { whatsappLink } from "@/lib/whatsapp";
 
 export const Route = createFileRoute("/")({
-  component: Index,
+  head: () => ({
+    meta: [
+      { title: "MNM Travels — Premium Vehicle Rentals in Tadipatri & Anantapur" },
+      { name: "description", content: "Comfortable, safe, affordable car & tempo traveller rentals across India. Innova, Tempo Traveller, Sedans. Book on WhatsApp 24/7." },
+      { property: "og:title", content: "MNM Travels — Premium Vehicle Rentals" },
+      { property: "og:description", content: "Premium vehicle rentals — sedans, SUVs, tempo travellers — across India since 2014." },
+    ],
+  }),
+  component: HomePage,
 });
 
-// IMPORTANT: Replace this placeholder. For sites with multiple pages (About, Services, Contact, etc.),
-// create separate route files (about.tsx, services.tsx, contact.tsx) — don't put all pages in this file.
-function PlaceholderIndex() {
+const heroes = [hero1, hero2, hero3];
+
+function HomePage() {
+  const [idx, setIdx] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => setIdx((i) => (i + 1) % heroes.length), 5000);
+    return () => clearInterval(t);
+  }, []);
+
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
+    <div>
+      {/* HERO */}
+      <section className="relative h-[88vh] min-h-[560px] overflow-hidden">
+        {heroes.map((src, i) => (
+          <div
+            key={i}
+            className="absolute inset-0 transition-opacity duration-1000"
+            style={{ opacity: idx === i ? 1 : 0 }}
+          >
+            <img src={src} alt="" className="w-full h-full object-cover" />
+            <div className="absolute inset-0 bg-gradient-hero" />
+          </div>
+        ))}
+
+        <div className="relative z-10 container mx-auto px-4 h-full flex flex-col justify-center text-primary-foreground">
+          <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
+            <span className="inline-block px-4 py-1.5 rounded-full bg-secondary/90 text-secondary-foreground text-xs font-bold tracking-wider uppercase mb-6">
+              Welcome to MNM Travels
+            </span>
+            <h1 className="font-display text-5xl md:text-7xl lg:text-8xl font-bold text-balance leading-[1.05] max-w-4xl">
+              Travel in <span className="text-secondary">Comfort</span>
+            </h1>
+            <p className="mt-6 text-lg md:text-xl text-primary-foreground/85 max-w-xl">
+              Premium vehicle rentals — sedans, SUVs and tempo travellers — across India. Trusted since 2014.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link
+                to="/fleet"
+                className="inline-flex items-center gap-2 bg-gradient-gold text-secondary-foreground px-7 py-4 rounded-full font-bold shadow-gold hover:scale-105 transition-smooth"
+              >
+                Explore Our Fleet <ArrowRight className="w-4 h-4" />
+              </Link>
+              <a
+                href={whatsappLink("Hi MNM Travels, I'd like to book a ride.")}
+                target="_blank"
+                rel="noopener"
+                className="inline-flex items-center gap-2 bg-success text-success-foreground px-7 py-4 rounded-full font-bold shadow-elegant hover:scale-105 transition-smooth"
+              >
+                <MessageCircle className="w-4 h-4" /> Book via WhatsApp
+              </a>
+            </div>
+            <div className="mt-12 flex flex-wrap gap-6 text-sm">
+              {[
+                { icon: Shield, label: "Safe & Reliable" },
+                { icon: Clock, label: "24/7 Support" },
+                { icon: Users, label: "Pan India Service" },
+              ].map((f) => (
+                <div key={f.label} className="flex items-center gap-2 text-primary-foreground/85">
+                  <f.icon className="w-4 h-4 text-secondary" /> {f.label}
+                </div>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* slide indicators */}
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
+            {heroes.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setIdx(i)}
+                aria-label={`Slide ${i + 1}`}
+                className={`h-1.5 rounded-full transition-all ${idx === i ? "w-10 bg-secondary" : "w-4 bg-primary-foreground/40"}`}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* STATS */}
+      <section className="bg-muted py-12">
+        <div className="container mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-6">
+          {[
+            { n: "10+", l: "Years Experience" },
+            { n: "5000+", l: "Happy Customers" },
+            { n: "8+", l: "Vehicles Fleet" },
+            { n: "100%", l: "Satisfaction" },
+          ].map((s) => (
+            <div key={s.l} className="text-center">
+              <div className="font-display text-4xl md:text-5xl font-bold text-primary">{s.n}</div>
+              <div className="mt-1 text-sm text-muted-foreground uppercase tracking-wider">{s.l}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* SERVICES PREVIEW */}
+      <section className="container mx-auto px-4 py-20">
+        <div className="text-center max-w-2xl mx-auto mb-14">
+          <span className="text-secondary font-bold text-sm uppercase tracking-widest">What We Offer</span>
+          <h2 className="font-display text-4xl md:text-5xl mt-2">Our Premium Services</h2>
+          <p className="mt-4 text-muted-foreground">Experience the best travel services with MNM Travels — your trusted partner.</p>
+        </div>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          {[
+            { t: "Local & Outstation", d: "Flexible rentals for city & long-distance travel" },
+            { t: "Group Tours", d: "Spacious tempo travellers for family & pilgrimages" },
+            { t: "Corporate Travel", d: "Professional transport for business needs" },
+            { t: "Wedding Transport", d: "Elegant vehicles for your special day" },
+            { t: "Airport Transfers", d: "Reliable pickup & drop services" },
+            { t: "Hourly Rentals", d: "Flexible packages for short trips" },
+            { t: "Safe & Insured", d: "Fully insured fleet, experienced drivers" },
+            { t: "24/7 Support", d: "Round-the-clock customer support" },
+          ].map((s, i) => (
+            <motion.div
+              key={s.t}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.05 }}
+              className="p-6 rounded-2xl bg-card border border-border shadow-card hover:shadow-elegant hover:-translate-y-1 transition-smooth"
+            >
+              <CheckCircle2 className="w-8 h-8 text-secondary mb-3" />
+              <h3 className="font-semibold text-lg">{s.t}</h3>
+              <p className="text-sm text-muted-foreground mt-1">{s.d}</p>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="container mx-auto px-4 pb-20">
+        <div className="rounded-3xl bg-gradient-primary p-10 md:p-16 text-primary-foreground shadow-elegant relative overflow-hidden">
+          <Star className="absolute -top-8 -right-8 w-48 h-48 text-secondary/20" />
+          <div className="relative max-w-2xl">
+            <h2 className="font-display text-4xl md:text-5xl">Ready to hit the road?</h2>
+            <p className="mt-3 text-primary-foreground/80">Book your next journey with MNM Travels and enjoy premium comfort at affordable prices.</p>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <Link to="/fleet" className="inline-flex items-center gap-2 bg-gradient-gold text-secondary-foreground px-6 py-3 rounded-full font-bold shadow-gold hover:scale-105 transition-smooth">
+                Book Your Ride <ArrowRight className="w-4 h-4" />
+              </Link>
+              <a href="tel:919492456488" className="inline-flex items-center gap-2 bg-primary-foreground/10 backdrop-blur px-6 py-3 rounded-full font-bold border border-primary-foreground/20 hover:bg-primary-foreground/20 transition-smooth">
+                <Phone className="w-4 h-4" /> 919492456488
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   );
-}
-
-function Index() {
-  return <PlaceholderIndex />;
 }
