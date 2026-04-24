@@ -18,23 +18,31 @@ function AdminLayout() {
 
   useEffect(() => {
     let mounted = true;
+    // Listen to subsequent auth changes (sign-out etc.)
     const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
-      if (!session) navigate({ to: "/admin/login" });
+      if (!mounted) return;
+      if (!session) {
+        setIsAdmin(false);
+        navigate({ to: "/admin/login" });
+      }
     });
     (async () => {
       const { data } = await supabase.auth.getSession();
       if (!mounted) return;
       if (!data.session) {
+        setLoading(false);
         navigate({ to: "/admin/login" });
         return;
       }
       setEmail(data.session.user.email ?? "");
-      const { data: roleData } = await supabase
+      const { data: roleData, error: roleError } = await supabase
         .from("user_roles")
         .select("role")
         .eq("user_id", data.session.user.id)
         .eq("role", "admin")
         .maybeSingle();
+      if (!mounted) return;
+      if (roleError) console.error("Role check failed:", roleError);
       setIsAdmin(!!roleData);
       setLoading(false);
     })();
