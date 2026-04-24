@@ -31,7 +31,7 @@ function AdminSettings() {
   }, []);
 
   const save = async (key: string, value: object) => {
-    await supabase.from("site_settings").upsert({ key, value });
+    await supabase.from("site_settings").upsert([{ key, value: value as never }]);
     setSaved(key);
     setTimeout(() => setSaved(""), 1500);
   };
