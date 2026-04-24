@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate, useRouter, Link, Outlet } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { LayoutDashboard, Car, Calendar, Settings, LogOut, Loader2 } from "lucide-react";
+import { LayoutDashboard, Car, Calendar, Settings, LogOut, Loader2, Copy, Check, RefreshCw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/admin")({
