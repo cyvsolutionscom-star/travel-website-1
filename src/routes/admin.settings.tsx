@@ -4,7 +4,7 @@ import { Loader2, Save } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/admin/settings")({
-  component: AdminSettings;
+  component: AdminSettings,
 });
 
 type ContactCfg = { phones: string[]; email: string; whatsapp: string; address: string };
