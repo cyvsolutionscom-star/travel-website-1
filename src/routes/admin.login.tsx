@@ -76,13 +76,32 @@ function AdminLogin() {
           {msg && <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-lg">{msg}</div>}
           <button type="submit" disabled={loading} className="w-full inline-flex items-center justify-center gap-2 bg-gradient-primary text-primary-foreground py-3 rounded-full font-bold shadow-elegant hover:scale-[1.02] transition-smooth disabled:opacity-60">
             {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-            {mode === "login" ? "Sign In" : "Create Account"}
+            {mode === "login" ? "Sign In" : "Create Admin Account"}
           </button>
         </form>
 
-        <button onClick={() => setMode(mode === "login" ? "signup" : "login")} className="mt-4 w-full text-sm text-muted-foreground hover:text-foreground">
-          {mode === "login" ? "Need an account? Sign up" : "Already have an account? Sign in"}
-        </button>
+        {mode === "login" && (
+          <>
+            <div className="relative my-5">
+              <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-border" /></div>
+              <div className="relative flex justify-center"><span className="bg-card px-3 text-xs uppercase tracking-wider text-muted-foreground">First time?</span></div>
+            </div>
+            <button
+              type="button"
+              onClick={() => { setMode("signup"); setMsg(""); }}
+              className="w-full inline-flex items-center justify-center gap-2 border-2 border-primary text-primary py-3 rounded-full font-bold hover:bg-primary hover:text-primary-foreground transition-smooth"
+            >
+              Create Admin Account
+            </button>
+            <p className="mt-2 text-[11px] text-center text-muted-foreground">The first account created becomes the admin automatically.</p>
+          </>
+        )}
+
+        {mode === "signup" && (
+          <button onClick={() => { setMode("login"); setMsg(""); }} className="mt-4 w-full text-sm text-muted-foreground hover:text-foreground">
+            Already have an account? Sign in
+          </button>
+        )}
         <Link to="/" className="block text-center mt-6 text-xs text-muted-foreground hover:text-foreground">← Back to site</Link>
       </div>
     </div>
