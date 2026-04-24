@@ -16,7 +16,10 @@ function AdminLayout() {
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const [email, setEmail] = useState("");
+  const [userId, setUserId] = useState("");
   const [signingOut, setSigningOut] = useState(false);
+  const [copied, setCopied] = useState<"id" | "sql" | null>(null);
+  const [rechecking, setRechecking] = useState(false);
 
   useEffect(() => {
     let mounted = true;
