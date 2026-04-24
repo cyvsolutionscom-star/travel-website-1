@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate, Link, Outlet } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, useRouter, Link, Outlet } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { LayoutDashboard, Car, Calendar, Settings, LogOut, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -12,9 +12,11 @@ export const Route = createFileRoute("/admin")({
 
 function AdminLayout() {
   const navigate = useNavigate();
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const [email, setEmail] = useState("");
+  const [signingOut, setSigningOut] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -63,6 +65,24 @@ function AdminLayout() {
     };
   }, [navigate]);
 
+  async function handleSignOut() {
+    if (signingOut) return;
+    setSigningOut(true);
+
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error("Sign out failed:", error);
+      }
+    } finally {
+      setIsAdmin(false);
+      setEmail("");
+      await router.invalidate();
+      navigate({ to: "/admin/login", replace: true });
+      setSigningOut(false);
+    }
+  }
+
   if (loading) {
     return <div className="min-h-screen grid place-items-center"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>;
   }
@@ -78,8 +98,12 @@ function AdminLayout() {
           <p className="mt-3 text-muted-foreground text-xs">
             To grant admin access, an existing admin must add a row to <code className="bg-muted px-1.5 py-0.5 rounded">user_roles</code> with your user ID and role <code className="bg-muted px-1.5 py-0.5 rounded">admin</code>. The first admin can be added directly via the Cloud database UI.
           </p>
-          <button onClick={() => supabase.auth.signOut().then(() => navigate({ to: "/admin/login" }))} className="mt-5 inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary text-primary-foreground text-sm font-semibold">
-            <LogOut className="w-4 h-4" /> Sign Out
+          <button
+            onClick={handleSignOut}
+            disabled={signingOut}
+            className="mt-5 inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary text-primary-foreground text-sm font-semibold disabled:opacity-60"
+          >
+            {signingOut ? <Loader2 className="w-4 h-4 animate-spin" /> : <LogOut className="w-4 h-4" />} Sign Out
           </button>
         </div>
       </div>
@@ -102,8 +126,12 @@ function AdminLayout() {
         </nav>
         <div className="p-3 border-t border-primary-foreground/10">
           <div className="px-3 py-2 text-xs text-primary-foreground/60 truncate">{email}</div>
-          <button onClick={() => supabase.auth.signOut().then(() => navigate({ to: "/admin/login" }))} className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm hover:bg-primary-foreground/10">
-            <LogOut className="w-4 h-4" /> Sign Out
+          <button
+            onClick={handleSignOut}
+            disabled={signingOut}
+            className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm hover:bg-primary-foreground/10 disabled:opacity-60"
+          >
+            {signingOut ? <Loader2 className="w-4 h-4 animate-spin" /> : <LogOut className="w-4 h-4" />} Sign Out
           </button>
         </div>
       </aside>
