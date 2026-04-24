@@ -37,6 +37,7 @@ function AdminLayout() {
       }
 
       setEmail(session.user.email ?? "");
+      setUserId(session.user.id);
 
       const { data: hasAdminRole, error: roleError } = await supabase.rpc("has_role", {
         _user_id: session.user.id,
