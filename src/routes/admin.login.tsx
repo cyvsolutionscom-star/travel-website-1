@@ -29,14 +29,20 @@ function AdminLogin() {
     setLoading(true);
     setMsg("");
     if (mode === "signup") {
-      const { error } = await supabase.auth.signUp({
+      const { error: signUpError } = await supabase.auth.signUp({
         email,
         password,
         options: { emailRedirectTo: window.location.origin + "/admin" },
       });
+      if (signUpError) {
+        setLoading(false);
+        return setMsg(signUpError.message);
+      }
+      // Auto sign-in after signup (auto-confirm is enabled)
+      const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
       setLoading(false);
-      if (error) return setMsg(error.message);
-      setMsg("Account created! An admin must grant you the 'admin' role before you can access the dashboard.");
+      if (signInError) return setMsg(signInError.message);
+      navigate({ to: "/admin" });
       return;
     }
     const { error } = await supabase.auth.signInWithPassword({ email, password });
