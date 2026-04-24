@@ -18,34 +18,45 @@ function AdminLayout() {
 
   useEffect(() => {
     let mounted = true;
-    // Listen to subsequent auth changes (sign-out etc.)
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
+
+    const loadAdminState = async (sessionOverride?: Awaited<ReturnType<typeof supabase.auth.getSession>>["data"]["session"]) => {
+      const session = sessionOverride ?? (await supabase.auth.getSession()).data.session;
+
       if (!mounted) return;
+
       if (!session) {
-        setIsAdmin(false);
-        navigate({ to: "/admin/login" });
-      }
-    });
-    (async () => {
-      const { data } = await supabase.auth.getSession();
-      if (!mounted) return;
-      if (!data.session) {
         setLoading(false);
+        setIsAdmin(false);
         navigate({ to: "/admin/login" });
         return;
       }
-      setEmail(data.session.user.email ?? "");
-      const { data: roleData, error: roleError } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", data.session.user.id)
-        .eq("role", "admin")
-        .maybeSingle();
+
+      setEmail(session.user.email ?? "");
+
+      const { data: hasAdminRole, error: roleError } = await supabase.rpc("has_role", {
+        _user_id: session.user.id,
+        _role: "admin",
+      });
+
       if (!mounted) return;
-      if (roleError) console.error("Role check failed:", roleError);
-      setIsAdmin(!!roleData);
+
+      if (roleError) {
+        console.error("Role check failed:", roleError);
+        setIsAdmin(false);
+      } else {
+        setIsAdmin(Boolean(hasAdminRole));
+      }
+
       setLoading(false);
-    })();
+    };
+
+    void loadAdminState();
+
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!mounted) return;
+      void loadAdminState(session);
+    });
+
     return () => {
       mounted = false;
       sub.subscription.unsubscribe();
