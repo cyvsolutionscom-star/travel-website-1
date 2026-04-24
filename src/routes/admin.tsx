@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate, useRouter, Link, Outlet } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { LayoutDashboard, Car, Calendar, Settings, LogOut, Loader2 } from "lucide-react";
+import { LayoutDashboard, Car, Calendar, Settings, LogOut, Loader2, Copy, Check, RefreshCw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/admin")({
@@ -16,7 +16,10 @@ function AdminLayout() {
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const [email, setEmail] = useState("");
+  const [userId, setUserId] = useState("");
   const [signingOut, setSigningOut] = useState(false);
+  const [copied, setCopied] = useState<"id" | "sql" | null>(null);
+  const [rechecking, setRechecking] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -34,6 +37,7 @@ function AdminLayout() {
       }
 
       setEmail(session.user.email ?? "");
+      setUserId(session.user.id);
 
       const { data: hasAdminRole, error: roleError } = await supabase.rpc("has_role", {
         _user_id: session.user.id,
@@ -83,28 +87,98 @@ function AdminLayout() {
     }
   }
 
+  async function copyToClipboard(text: string, key: "id" | "sql") {
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch {
+      // Fallback for older browsers / insecure contexts
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand("copy"); } catch { /* noop */ }
+      document.body.removeChild(ta);
+    }
+    setCopied(key);
+    setTimeout(() => setCopied((c) => (c === key ? null : c)), 1800);
+  }
+
+  async function recheckRole() {
+    if (rechecking) return;
+    setRechecking(true);
+    const { data: session } = await supabase.auth.getSession();
+    if (session.session) {
+      const { data: hasAdminRole } = await supabase.rpc("has_role", {
+        _user_id: session.session.user.id,
+        _role: "admin",
+      });
+      setIsAdmin(Boolean(hasAdminRole));
+    }
+    setRechecking(false);
+  }
+
   if (loading) {
     return <div className="min-h-screen grid place-items-center"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>;
   }
 
   if (!isAdmin) {
+    const sqlSnippet = `INSERT INTO public.user_roles (user_id, role) VALUES ('${userId}', 'admin');`;
     return (
-      <div className="min-h-screen grid place-items-center px-4">
-        <div className="max-w-md text-center p-8 rounded-2xl bg-card border border-border shadow-elegant">
-          <h1 className="font-display text-2xl">Access Pending</h1>
-          <p className="mt-3 text-muted-foreground text-sm">
+      <div className="min-h-screen grid place-items-center px-4 py-12">
+        <div className="w-full max-w-lg p-8 rounded-2xl bg-card border border-border shadow-elegant">
+          <h1 className="font-display text-2xl text-center">Access Pending</h1>
+          <p className="mt-3 text-center text-muted-foreground text-sm">
             Your account <strong>{email}</strong> is signed in but doesn't have the admin role yet.
           </p>
-          <p className="mt-3 text-muted-foreground text-xs">
-            To grant admin access, an existing admin must add a row to <code className="bg-muted px-1.5 py-0.5 rounded">user_roles</code> with your user ID and role <code className="bg-muted px-1.5 py-0.5 rounded">admin</code>. The first admin can be added directly via the Cloud database UI.
+
+          <div className="mt-6 text-left">
+            <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Your User ID</label>
+            <div className="mt-1.5 flex items-stretch gap-2">
+              <code className="flex-1 min-w-0 px-3 py-2.5 rounded-lg bg-muted text-xs font-mono break-all">{userId}</code>
+              <button
+                onClick={() => copyToClipboard(userId, "id")}
+                className="shrink-0 inline-flex items-center gap-1.5 px-3 rounded-lg bg-primary text-primary-foreground text-xs font-semibold hover:opacity-90"
+              >
+                {copied === "id" ? <><Check className="w-4 h-4" /> Copied</> : <><Copy className="w-4 h-4" /> Copy</>}
+              </button>
+            </div>
+          </div>
+
+          <div className="mt-4 text-left">
+            <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Or run this SQL in the Cloud database</label>
+            <div className="mt-1.5 flex items-stretch gap-2">
+              <code className="flex-1 min-w-0 px-3 py-2.5 rounded-lg bg-muted text-[11px] font-mono break-all">{sqlSnippet}</code>
+              <button
+                onClick={() => copyToClipboard(sqlSnippet, "sql")}
+                className="shrink-0 inline-flex items-center gap-1.5 px-3 rounded-lg border border-input bg-background text-xs font-semibold hover:bg-muted"
+              >
+                {copied === "sql" ? <><Check className="w-4 h-4" /> Copied</> : <><Copy className="w-4 h-4" /> Copy</>}
+              </button>
+            </div>
+          </div>
+
+          <p className="mt-5 text-xs text-muted-foreground">
+            Add this row to <code className="bg-muted px-1.5 py-0.5 rounded">user_roles</code> via the Cloud database, then click <strong>Re-check</strong>.
           </p>
-          <button
-            onClick={handleSignOut}
-            disabled={signingOut}
-            className="mt-5 inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary text-primary-foreground text-sm font-semibold disabled:opacity-60"
-          >
-            {signingOut ? <Loader2 className="w-4 h-4 animate-spin" /> : <LogOut className="w-4 h-4" />} Sign Out
-          </button>
+
+          <div className="mt-5 flex flex-col sm:flex-row gap-2 justify-center">
+            <button
+              onClick={recheckRole}
+              disabled={rechecking}
+              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-gradient-primary text-primary-foreground text-sm font-semibold shadow-elegant disabled:opacity-60"
+            >
+              {rechecking ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />} Re-check role
+            </button>
+            <button
+              onClick={handleSignOut}
+              disabled={signingOut}
+              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full border border-input bg-background text-sm font-semibold hover:bg-muted disabled:opacity-60"
+            >
+              {signingOut ? <Loader2 className="w-4 h-4 animate-spin" /> : <LogOut className="w-4 h-4" />} Sign Out
+            </button>
+          </div>
         </div>
       </div>
     );
