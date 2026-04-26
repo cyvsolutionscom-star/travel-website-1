@@ -7,6 +7,7 @@ import hero2 from "@/assets/hero-2.jpg";
 import hero3 from "@/assets/hero-3.jpg";
 import { supabase } from "@/integrations/supabase/client";
 import { bookingMessage, whatsappLink } from "@/lib/whatsapp";
+import { useSiteSetting } from "@/hooks/useSiteSetting";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -32,10 +33,51 @@ type Vehicle = {
   description: string | null;
 };
 
+type StatItem = { n: string; l: string };
+type ServiceItem = { t: string; d: string };
+type LandingCfg = {
+  fleet_heading: string;
+  fleet_subheading: string;
+  services_heading: string;
+  services_tagline: string;
+  services_intro: string;
+  cta_heading: string;
+  cta_subheading: string;
+  stats: StatItem[];
+  services: ServiceItem[];
+};
+
+const defaultLanding: LandingCfg = {
+  fleet_heading: "Choose your ride",
+  fleet_subheading: "These vehicles and prices are managed from the admin dashboard.",
+  services_heading: "Our Premium Services",
+  services_tagline: "What We Offer",
+  services_intro: "Experience the best travel services with MNM Travels — your trusted partner.",
+  cta_heading: "Ready to hit the road?",
+  cta_subheading: "Book your next journey with MNM Travels and enjoy premium comfort at affordable prices.",
+  stats: [
+    { n: "10+", l: "Years Experience" },
+    { n: "5000+", l: "Happy Customers" },
+    { n: "8+", l: "Vehicles Fleet" },
+    { n: "100%", l: "Satisfaction" },
+  ],
+  services: [
+    { t: "Local & Outstation", d: "Flexible rentals for city & long-distance travel" },
+    { t: "Group Tours", d: "Spacious tempo travellers for family & pilgrimages" },
+    { t: "Corporate Travel", d: "Professional transport for business needs" },
+    { t: "Wedding Transport", d: "Elegant vehicles for your special day" },
+    { t: "Airport Transfers", d: "Reliable pickup & drop services" },
+    { t: "Hourly Rentals", d: "Flexible packages for short trips" },
+    { t: "Safe & Insured", d: "Fully insured fleet, experienced drivers" },
+    { t: "24/7 Support", d: "Round-the-clock customer support" },
+  ],
+};
+
 function HomePage() {
   const [idx, setIdx] = useState(0);
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [fleetLoading, setFleetLoading] = useState(true);
+  const { value: landing } = useSiteSetting<LandingCfg>("landing", defaultLanding);
 
   useEffect(() => {
     const t = setInterval(() => setIdx((i) => (i + 1) % heroes.length), 5000);
@@ -127,12 +169,7 @@ function HomePage() {
       {/* STATS */}
       <section className="bg-muted py-12">
         <div className="container mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-6">
-          {[
-            { n: "10+", l: "Years Experience" },
-            { n: "5000+", l: "Happy Customers" },
-            { n: "8+", l: "Vehicles Fleet" },
-            { n: "100%", l: "Satisfaction" },
-          ].map((s) => (
+          {landing.stats.map((s) => (
             <div key={s.l} className="text-center">
               <div className="font-display text-4xl md:text-5xl font-bold text-primary">{s.n}</div>
               <div className="mt-1 text-sm text-muted-foreground uppercase tracking-wider">{s.l}</div>
@@ -146,12 +183,17 @@ function HomePage() {
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-10">
           <div className="max-w-2xl">
             <span className="text-secondary font-bold text-sm uppercase tracking-widest">Our Fleet & Pricing</span>
-            <h2 className="font-display text-4xl md:text-5xl mt-2">Choose your ride</h2>
-            <p className="mt-4 text-muted-foreground">These vehicles and prices are managed from the admin dashboard.</p>
+            <h2 className="font-display text-4xl md:text-5xl mt-2">{landing.fleet_heading}</h2>
+            <p className="mt-4 text-muted-foreground">{landing.fleet_subheading}</p>
           </div>
-          <Link to="/fleet" className="inline-flex items-center gap-2 text-primary font-bold hover:text-accent transition-smooth">
-            View full fleet <ArrowRight className="w-4 h-4" />
-          </Link>
+          <div className="flex flex-wrap gap-3">
+            <Link to="/fleet" className="inline-flex items-center gap-2 text-primary font-bold hover:text-accent transition-smooth">
+              View full fleet <ArrowRight className="w-4 h-4" />
+            </Link>
+            <Link to="/request-car" className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-full font-semibold text-sm hover:scale-[1.02] transition-smooth">
+              Request a Vehicle
+            </Link>
+          </div>
         </div>
 
         {fleetLoading ? (
@@ -211,21 +253,12 @@ function HomePage() {
       {/* SERVICES PREVIEW */}
       <section className="container mx-auto px-4 py-20">
         <div className="text-center max-w-2xl mx-auto mb-14">
-          <span className="text-secondary font-bold text-sm uppercase tracking-widest">What We Offer</span>
-          <h2 className="font-display text-4xl md:text-5xl mt-2">Our Premium Services</h2>
-          <p className="mt-4 text-muted-foreground">Experience the best travel services with MNM Travels — your trusted partner.</p>
+          <span className="text-secondary font-bold text-sm uppercase tracking-widest">{landing.services_tagline}</span>
+          <h2 className="font-display text-4xl md:text-5xl mt-2">{landing.services_heading}</h2>
+          <p className="mt-4 text-muted-foreground">{landing.services_intro}</p>
         </div>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {[
-            { t: "Local & Outstation", d: "Flexible rentals for city & long-distance travel" },
-            { t: "Group Tours", d: "Spacious tempo travellers for family & pilgrimages" },
-            { t: "Corporate Travel", d: "Professional transport for business needs" },
-            { t: "Wedding Transport", d: "Elegant vehicles for your special day" },
-            { t: "Airport Transfers", d: "Reliable pickup & drop services" },
-            { t: "Hourly Rentals", d: "Flexible packages for short trips" },
-            { t: "Safe & Insured", d: "Fully insured fleet, experienced drivers" },
-            { t: "24/7 Support", d: "Round-the-clock customer support" },
-          ].map((s, i) => (
+          {landing.services.map((s, i) => (
             <motion.div
               key={s.t}
               initial={{ opacity: 0, y: 20 }}
@@ -247,8 +280,8 @@ function HomePage() {
         <div className="rounded-3xl bg-gradient-primary p-10 md:p-16 text-primary-foreground shadow-elegant relative overflow-hidden">
           <Star className="absolute -top-8 -right-8 w-48 h-48 text-secondary/20" />
           <div className="relative max-w-2xl">
-            <h2 className="font-display text-4xl md:text-5xl">Ready to hit the road?</h2>
-            <p className="mt-3 text-primary-foreground/80">Book your next journey with MNM Travels and enjoy premium comfort at affordable prices.</p>
+            <h2 className="font-display text-4xl md:text-5xl">{landing.cta_heading}</h2>
+            <p className="mt-3 text-primary-foreground/80">{landing.cta_subheading}</p>
             <div className="mt-6 flex flex-wrap gap-3">
               <Link to="/fleet" className="inline-flex items-center gap-2 bg-gradient-gold text-secondary-foreground px-6 py-3 rounded-full font-bold shadow-gold hover:scale-105 transition-smooth">
                 Book Your Ride <ArrowRight className="w-4 h-4" />
