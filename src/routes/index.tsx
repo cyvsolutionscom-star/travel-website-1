@@ -1,11 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { ArrowRight, Shield, Clock, Users, Star, CheckCircle2, MessageCircle, Phone } from "lucide-react";
+import { ArrowRight, Shield, Clock, Users, Star, CheckCircle2, MessageCircle, Phone, Loader2 } from "lucide-react";
 import hero1 from "@/assets/hero-1.jpg";
 import hero2 from "@/assets/hero-2.jpg";
 import hero3 from "@/assets/hero-3.jpg";
-import { whatsappLink } from "@/lib/whatsapp";
+import { supabase } from "@/integrations/supabase/client";
+import { bookingMessage, whatsappLink } from "@/lib/whatsapp";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -21,11 +22,37 @@ export const Route = createFileRoute("/")({
 
 const heroes = [hero1, hero2, hero3];
 
+type Vehicle = {
+  id: string;
+  name: string;
+  seater: number;
+  daily_rent: number;
+  per_km_rate: string | null;
+  image_url: string | null;
+  description: string | null;
+};
+
 function HomePage() {
   const [idx, setIdx] = useState(0);
+  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [fleetLoading, setFleetLoading] = useState(true);
+
   useEffect(() => {
     const t = setInterval(() => setIdx((i) => (i + 1) % heroes.length), 5000);
     return () => clearInterval(t);
+  }, []);
+
+  useEffect(() => {
+    supabase
+      .from("vehicles")
+      .select("id,name,seater,daily_rent,per_km_rate,image_url,description")
+      .eq("active", true)
+      .order("display_order", { ascending: true })
+      .limit(6)
+      .then(({ data }) => {
+        setVehicles(data ?? []);
+        setFleetLoading(false);
+      });
   }, []);
 
   return (
@@ -112,6 +139,73 @@ function HomePage() {
             </div>
           ))}
         </div>
+      </section>
+
+      {/* FLEET & PRICING */}
+      <section className="container mx-auto px-4 py-20">
+        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-10">
+          <div className="max-w-2xl">
+            <span className="text-secondary font-bold text-sm uppercase tracking-widest">Our Fleet & Pricing</span>
+            <h2 className="font-display text-4xl md:text-5xl mt-2">Choose your ride</h2>
+            <p className="mt-4 text-muted-foreground">These vehicles and prices are managed from the admin dashboard.</p>
+          </div>
+          <Link to="/fleet" className="inline-flex items-center gap-2 text-primary font-bold hover:text-accent transition-smooth">
+            View full fleet <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
+
+        {fleetLoading ? (
+          <div className="py-16 grid place-items-center">
+            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          </div>
+        ) : vehicles.length === 0 ? (
+          <div className="rounded-2xl border border-border bg-card p-8 text-center text-muted-foreground">
+            No active vehicles available yet.
+          </div>
+        ) : (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {vehicles.map((vehicle, i) => (
+              <motion.article
+                key={vehicle.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.05 }}
+                className="overflow-hidden rounded-2xl bg-card border border-border shadow-card hover:shadow-elegant transition-smooth"
+              >
+                <div className="aspect-[4/3] bg-muted overflow-hidden">
+                  {vehicle.image_url ? (
+                    <img src={vehicle.image_url} alt={vehicle.name} className="h-full w-full object-cover" loading="lazy" />
+                  ) : (
+                    <div className="h-full w-full grid place-items-center text-muted-foreground font-semibold">MNM Travels</div>
+                  )}
+                </div>
+                <div className="p-6">
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <h3 className="font-display text-2xl">{vehicle.name}</h3>
+                      <p className="mt-1 text-sm text-muted-foreground">{vehicle.seater} seater</p>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <div className="font-display text-2xl text-primary">₹{vehicle.daily_rent.toLocaleString("en-IN")}</div>
+                      <div className="text-xs text-muted-foreground">per day</div>
+                    </div>
+                  </div>
+                  {vehicle.description && <p className="mt-4 text-sm text-muted-foreground line-clamp-2">{vehicle.description}</p>}
+                  {vehicle.per_km_rate && <div className="mt-4 text-sm font-semibold text-secondary">{vehicle.per_km_rate}</div>}
+                  <a
+                    href={whatsappLink(bookingMessage({ vehicle: vehicle.name }))}
+                    target="_blank"
+                    rel="noopener"
+                    className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full bg-success px-5 py-3 font-bold text-success-foreground shadow-elegant hover:scale-[1.02] transition-smooth"
+                  >
+                    <MessageCircle className="w-4 h-4" /> Book via WhatsApp
+                  </a>
+                </div>
+              </motion.article>
+            ))}
+          </div>
+        )}
       </section>
 
       {/* SERVICES PREVIEW */}

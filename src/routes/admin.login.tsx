@@ -29,7 +29,7 @@ function AdminLogin() {
     setLoading(true);
     setMsg("");
     if (mode === "signup") {
-      const { error: signUpError } = await supabase.auth.signUp({
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
         options: { emailRedirectTo: window.location.origin + "/admin" },
@@ -38,11 +38,9 @@ function AdminLogin() {
         setLoading(false);
         return setMsg(signUpError.message);
       }
-      // Auto sign-in after signup (auto-confirm is enabled)
-      const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
       setLoading(false);
-      if (signInError) return setMsg(signInError.message);
-      navigate({ to: "/admin" });
+      if (signUpData.session) navigate({ to: "/admin" });
+      else setMsg("Account created. Please verify your email, then sign in to see your user ID.");
       return;
     }
     const { error } = await supabase.auth.signInWithPassword({ email, password });
@@ -93,7 +91,7 @@ function AdminLogin() {
             >
               Create Admin Account
             </button>
-            <p className="mt-2 text-[11px] text-center text-muted-foreground">The first account created becomes the admin automatically.</p>
+            <p className="mt-2 text-[11px] text-center text-muted-foreground">Create an account, then copy your user ID from the access screen to grant admin access.</p>
           </>
         )}
 

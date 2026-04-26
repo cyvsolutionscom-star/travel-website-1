@@ -29,9 +29,11 @@ function AdminLayout() {
 
       if (!mounted) return;
 
-      if (!session) {
+      if (!session?.user?.id) {
         setLoading(false);
         setIsAdmin(false);
+        setEmail("");
+        setUserId("");
         navigate({ to: "/admin/login" });
         return;
       }
@@ -56,12 +58,12 @@ function AdminLayout() {
       setLoading(false);
     };
 
-    void loadAdminState();
-
     const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
       if (!mounted) return;
       void loadAdminState(session);
     });
+
+    void loadAdminState();
 
     return () => {
       mounted = false;
@@ -109,12 +111,19 @@ function AdminLayout() {
     if (rechecking) return;
     setRechecking(true);
     const { data: session } = await supabase.auth.getSession();
-    if (session.session) {
+    if (session.session?.user?.id) {
+      setEmail(session.session.user.email ?? "");
+      setUserId(session.session.user.id);
       const { data: hasAdminRole } = await supabase.rpc("has_role", {
         _user_id: session.session.user.id,
         _role: "admin",
       });
       setIsAdmin(Boolean(hasAdminRole));
+    } else {
+      setIsAdmin(false);
+      setEmail("");
+      setUserId("");
+      navigate({ to: "/admin/login", replace: true });
     }
     setRechecking(false);
   }
@@ -130,7 +139,7 @@ function AdminLayout() {
         <div className="w-full max-w-lg p-8 rounded-2xl bg-card border border-border shadow-elegant">
           <h1 className="font-display text-2xl text-center">Access Pending</h1>
           <p className="mt-3 text-center text-muted-foreground text-sm">
-            Your account <strong>{email}</strong> is signed in but doesn't have the admin role yet.
+            Your account <strong>{email || "this session"}</strong> is signed in but doesn't have the admin role yet.
           </p>
 
           <div className="mt-6 text-left">
@@ -139,6 +148,7 @@ function AdminLayout() {
               <code className="flex-1 min-w-0 px-3 py-2.5 rounded-lg bg-muted text-xs font-mono break-all">{userId}</code>
               <button
                 onClick={() => copyToClipboard(userId, "id")}
+                disabled={!userId}
                 className="shrink-0 inline-flex items-center gap-1.5 px-3 rounded-lg bg-primary text-primary-foreground text-xs font-semibold hover:opacity-90"
               >
                 {copied === "id" ? <><Check className="w-4 h-4" /> Copied</> : <><Copy className="w-4 h-4" /> Copy</>}
@@ -152,6 +162,7 @@ function AdminLayout() {
               <code className="flex-1 min-w-0 px-3 py-2.5 rounded-lg bg-muted text-[11px] font-mono break-all">{sqlSnippet}</code>
               <button
                 onClick={() => copyToClipboard(sqlSnippet, "sql")}
+                disabled={!userId}
                 className="shrink-0 inline-flex items-center gap-1.5 px-3 rounded-lg border border-input bg-background text-xs font-semibold hover:bg-muted"
               >
                 {copied === "sql" ? <><Check className="w-4 h-4" /> Copied</> : <><Copy className="w-4 h-4" /> Copy</>}
