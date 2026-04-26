@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate, useRouter, Link, Outlet } from "@tanstack/react-router";
+import { createFileRoute, useLocation, useNavigate, useRouter, Link, Outlet } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { LayoutDashboard, Car, Calendar, Settings, LogOut, Loader2, Copy, Check, RefreshCw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -13,6 +13,7 @@ export const Route = createFileRoute("/admin")({
 function AdminLayout() {
   const navigate = useNavigate();
   const router = useRouter();
+  const location = useLocation();
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const [email, setEmail] = useState("");
@@ -22,6 +23,11 @@ function AdminLayout() {
   const [rechecking, setRechecking] = useState(false);
 
   useEffect(() => {
+    if (location.pathname === "/admin/login") {
+      setLoading(false);
+      return;
+    }
+
     let mounted = true;
 
     const loadAdminState = async (sessionOverride?: Awaited<ReturnType<typeof supabase.auth.getSession>>["data"]["session"]) => {
@@ -69,7 +75,11 @@ function AdminLayout() {
       mounted = false;
       sub.subscription.unsubscribe();
     };
-  }, [navigate]);
+  }, [location.pathname, navigate]);
+
+  if (location.pathname === "/admin/login") {
+    return <Outlet />;
+  }
 
   async function handleSignOut() {
     if (signingOut) return;
