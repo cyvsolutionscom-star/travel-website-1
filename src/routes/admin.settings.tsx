@@ -10,11 +10,51 @@ export const Route = createFileRoute("/admin/settings")({
 type ContactCfg = { phones: string[]; email: string; whatsapp: string; address: string };
 type PaymentCfg = { upi_id: string; qr_image: string; cod_enabled: boolean; note: string };
 type HeroCfg = { title: string; subtitle: string; tagline: string };
+type StatItem = { n: string; l: string };
+type ServiceItem = { t: string; d: string };
+type LandingCfg = {
+  fleet_heading: string;
+  fleet_subheading: string;
+  services_heading: string;
+  services_tagline: string;
+  services_intro: string;
+  cta_heading: string;
+  cta_subheading: string;
+  stats: StatItem[];
+  services: ServiceItem[];
+};
+
+const defaultLanding: LandingCfg = {
+  fleet_heading: "Choose your ride",
+  fleet_subheading: "These vehicles and prices are managed from the admin dashboard.",
+  services_heading: "Our Premium Services",
+  services_tagline: "What We Offer",
+  services_intro: "Experience the best travel services with MNM Travels — your trusted partner.",
+  cta_heading: "Ready to hit the road?",
+  cta_subheading: "Book your next journey with MNM Travels and enjoy premium comfort at affordable prices.",
+  stats: [
+    { n: "10+", l: "Years Experience" },
+    { n: "5000+", l: "Happy Customers" },
+    { n: "8+", l: "Vehicles Fleet" },
+    { n: "100%", l: "Satisfaction" },
+  ],
+  services: [
+    { t: "Local & Outstation", d: "Flexible rentals for city & long-distance travel" },
+    { t: "Group Tours", d: "Spacious tempo travellers for family & pilgrimages" },
+    { t: "Corporate Travel", d: "Professional transport for business needs" },
+    { t: "Wedding Transport", d: "Elegant vehicles for your special day" },
+    { t: "Airport Transfers", d: "Reliable pickup & drop services" },
+    { t: "Hourly Rentals", d: "Flexible packages for short trips" },
+    { t: "Safe & Insured", d: "Fully insured fleet, experienced drivers" },
+    { t: "24/7 Support", d: "Round-the-clock customer support" },
+  ],
+};
 
 function AdminSettings() {
   const [contact, setContact] = useState<ContactCfg>({ phones: [], email: "", whatsapp: "", address: "" });
   const [payment, setPayment] = useState<PaymentCfg>({ upi_id: "", qr_image: "", cod_enabled: true, note: "" });
   const [hero, setHero] = useState<HeroCfg>({ title: "", subtitle: "", tagline: "" });
+  const [landing, setLanding] = useState<LandingCfg>(defaultLanding);
   const [loading, setLoading] = useState(true);
   const [saved, setSaved] = useState("");
 
@@ -25,6 +65,7 @@ function AdminSettings() {
         if (row.key === "contact") setContact(row.value as ContactCfg);
         if (row.key === "payment") setPayment(row.value as PaymentCfg);
         if (row.key === "hero") setHero(row.value as HeroCfg);
+        if (row.key === "landing") setLanding({ ...defaultLanding, ...(row.value as Partial<LandingCfg>) });
       });
       setLoading(false);
     })();
@@ -46,6 +87,67 @@ function AdminSettings() {
         <Field label="Tagline" value={hero.tagline} onChange={(v) => setHero({ ...hero, tagline: v })} />
         <Field label="Title" value={hero.title} onChange={(v) => setHero({ ...hero, title: v })} />
         <Field label="Subtitle" value={hero.subtitle} onChange={(v) => setHero({ ...hero, subtitle: v })} />
+      </Section>
+
+      <Section title="Landing — Fleet Section" saved={saved === "landing"} onSave={() => save("landing", landing)}>
+        <Field label="Fleet Heading" value={landing.fleet_heading} onChange={(v) => setLanding({ ...landing, fleet_heading: v })} />
+        <Field label="Fleet Subheading" value={landing.fleet_subheading} onChange={(v) => setLanding({ ...landing, fleet_subheading: v })} textarea />
+
+        <div className="pt-4 border-t border-border">
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="font-semibold text-sm">Stats (4 cards)</h3>
+            <button
+              type="button"
+              onClick={() => setLanding({ ...landing, stats: [...landing.stats, { n: "", l: "" }] })}
+              className="text-xs text-primary font-semibold"
+            >+ Add</button>
+          </div>
+          {landing.stats.map((s, i) => (
+            <div key={i} className="grid grid-cols-[1fr_2fr_auto] gap-2 mb-2 items-center">
+              <input value={s.n} onChange={(e) => {
+                const next = [...landing.stats]; next[i] = { ...next[i], n: e.target.value };
+                setLanding({ ...landing, stats: next });
+              }} placeholder="10+" className="rounded-md border border-input bg-background px-2 py-1.5 text-sm" />
+              <input value={s.l} onChange={(e) => {
+                const next = [...landing.stats]; next[i] = { ...next[i], l: e.target.value };
+                setLanding({ ...landing, stats: next });
+              }} placeholder="Years Experience" className="rounded-md border border-input bg-background px-2 py-1.5 text-sm" />
+              <button type="button" onClick={() => setLanding({ ...landing, stats: landing.stats.filter((_, j) => j !== i) })} className="text-destructive text-xs font-semibold px-2">×</button>
+            </div>
+          ))}
+        </div>
+
+        <div className="pt-4 border-t border-border">
+          <Field label="Services Tagline" value={landing.services_tagline} onChange={(v) => setLanding({ ...landing, services_tagline: v })} />
+          <Field label="Services Heading" value={landing.services_heading} onChange={(v) => setLanding({ ...landing, services_heading: v })} />
+          <Field label="Services Intro" value={landing.services_intro} onChange={(v) => setLanding({ ...landing, services_intro: v })} textarea />
+          <div className="flex items-center justify-between mt-3 mb-2">
+            <h3 className="font-semibold text-sm">Service Cards</h3>
+            <button
+              type="button"
+              onClick={() => setLanding({ ...landing, services: [...landing.services, { t: "", d: "" }] })}
+              className="text-xs text-primary font-semibold"
+            >+ Add</button>
+          </div>
+          {landing.services.map((s, i) => (
+            <div key={i} className="grid grid-cols-[1fr_2fr_auto] gap-2 mb-2 items-center">
+              <input value={s.t} onChange={(e) => {
+                const next = [...landing.services]; next[i] = { ...next[i], t: e.target.value };
+                setLanding({ ...landing, services: next });
+              }} placeholder="Title" className="rounded-md border border-input bg-background px-2 py-1.5 text-sm" />
+              <input value={s.d} onChange={(e) => {
+                const next = [...landing.services]; next[i] = { ...next[i], d: e.target.value };
+                setLanding({ ...landing, services: next });
+              }} placeholder="Description" className="rounded-md border border-input bg-background px-2 py-1.5 text-sm" />
+              <button type="button" onClick={() => setLanding({ ...landing, services: landing.services.filter((_, j) => j !== i) })} className="text-destructive text-xs font-semibold px-2">×</button>
+            </div>
+          ))}
+        </div>
+
+        <div className="pt-4 border-t border-border">
+          <Field label="Final CTA Heading" value={landing.cta_heading} onChange={(v) => setLanding({ ...landing, cta_heading: v })} />
+          <Field label="Final CTA Subheading" value={landing.cta_subheading} onChange={(v) => setLanding({ ...landing, cta_subheading: v })} textarea />
+        </div>
       </Section>
 
       <Section title="Contact Info" saved={saved === "contact"} onSave={() => save("contact", contact)}>

@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ServicesRouteImport } from './routes/services'
+import { Route as RequestCarRouteImport } from './routes/request-car'
 import { Route as PaymentRouteImport } from './routes/payment'
 import { Route as FleetRouteImport } from './routes/fleet'
 import { Route as ContactRouteImport } from './routes/contact'
@@ -26,6 +27,11 @@ import { Route as AdminBookingsRouteImport } from './routes/admin.bookings'
 const ServicesRoute = ServicesRouteImport.update({
   id: '/services',
   path: '/services',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RequestCarRoute = RequestCarRouteImport.update({
+  id: '/request-car',
+  path: '/request-car',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PaymentRoute = PaymentRouteImport.update({
@@ -97,6 +103,7 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/fleet': typeof FleetRoute
   '/payment': typeof PaymentRoute
+  '/request-car': typeof RequestCarRoute
   '/services': typeof ServicesRoute
   '/admin/bookings': typeof AdminBookingsRoute
   '/admin/login': typeof AdminLoginRoute
@@ -111,6 +118,7 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/fleet': typeof FleetRoute
   '/payment': typeof PaymentRoute
+  '/request-car': typeof RequestCarRoute
   '/services': typeof ServicesRoute
   '/admin/bookings': typeof AdminBookingsRoute
   '/admin/login': typeof AdminLoginRoute
@@ -127,6 +135,7 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/fleet': typeof FleetRoute
   '/payment': typeof PaymentRoute
+  '/request-car': typeof RequestCarRoute
   '/services': typeof ServicesRoute
   '/admin/bookings': typeof AdminBookingsRoute
   '/admin/login': typeof AdminLoginRoute
@@ -144,6 +153,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/fleet'
     | '/payment'
+    | '/request-car'
     | '/services'
     | '/admin/bookings'
     | '/admin/login'
@@ -158,6 +168,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/fleet'
     | '/payment'
+    | '/request-car'
     | '/services'
     | '/admin/bookings'
     | '/admin/login'
@@ -173,6 +184,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/fleet'
     | '/payment'
+    | '/request-car'
     | '/services'
     | '/admin/bookings'
     | '/admin/login'
@@ -189,6 +201,7 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   FleetRoute: typeof FleetRoute
   PaymentRoute: typeof PaymentRoute
+  RequestCarRoute: typeof RequestCarRoute
   ServicesRoute: typeof ServicesRoute
 }
 
@@ -199,6 +212,13 @@ declare module '@tanstack/react-router' {
       path: '/services'
       fullPath: '/services'
       preLoaderRoute: typeof ServicesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/request-car': {
+      id: '/request-car'
+      path: '/request-car'
+      fullPath: '/request-car'
+      preLoaderRoute: typeof RequestCarRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/payment': {
@@ -314,6 +334,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   FleetRoute: FleetRoute,
   PaymentRoute: PaymentRoute,
+  RequestCarRoute: RequestCarRoute,
   ServicesRoute: ServicesRoute,
 }
 export const routeTree = rootRouteImport
