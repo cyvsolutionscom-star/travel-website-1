@@ -63,7 +63,7 @@ function AdminSettings() {
     (async () => {
       const { data } = await supabase.from("site_settings").select("key,value");
       data?.forEach((row) => {
-        if (row.key === "contact") setContact(row.value as ContactCfg);
+        if (row.key === "contact") setContact({ phones: [], email: "", whatsapp: "", address: "", map_embed_url: "", ...(row.value as Partial<ContactCfg>) });
         if (row.key === "payment") setPayment(row.value as PaymentCfg);
         if (row.key === "hero") setHero({ title: "", subtitle: "", tagline: "", images: [], ...(row.value as Partial<HeroCfg>) });
         if (row.key === "landing") setLanding({ ...defaultLanding, ...(row.value as Partial<LandingCfg>) });
