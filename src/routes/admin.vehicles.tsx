@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Plus, Trash2, Loader2, Save } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { ImageUpload } from "@/components/ImageUpload";
 
 export const Route = createFileRoute("/admin/vehicles")({
   component: AdminVehicles,
@@ -72,25 +73,29 @@ function AdminVehicles() {
 
       <div className="space-y-4">
         {vehicles.map((v) => (
-          <div key={v.id} className="p-5 rounded-2xl bg-card border border-border shadow-card grid md:grid-cols-[120px_1fr_auto] gap-5 items-start">
+          <div key={v.id} className="p-5 rounded-2xl bg-card border border-border shadow-card grid md:grid-cols-[140px_1fr_auto] gap-5 items-start">
             <div className="aspect-[4/3] rounded-lg bg-muted overflow-hidden">
-              {v.image_url && <img src={v.image_url} alt={v.name} className="w-full h-full object-cover" />}
+              <ImageUpload
+                value={v.image_url ?? ""}
+                onChange={(url) => update(v.id, { image_url: url })}
+                folder="vehicles"
+                className="w-full h-full"
+              />
             </div>
             <div className="grid sm:grid-cols-2 gap-3">
               <Input label="Name" value={v.name} onChange={(x) => update(v.id, { name: x })} />
-              <Input label="Image URL" value={v.image_url ?? ""} onChange={(x) => update(v.id, { image_url: x })} />
               <Input label="Seater" type="number" value={String(v.seater)} onChange={(x) => update(v.id, { seater: Number(x) })} />
               <Input label="Daily Rent (₹)" type="number" value={String(v.daily_rent)} onChange={(x) => update(v.id, { daily_rent: Number(x) })} />
               <Input label="Per km rate" value={v.per_km_rate ?? ""} onChange={(x) => update(v.id, { per_km_rate: x })} />
               <Input label="Order" type="number" value={String(v.display_order)} onChange={(x) => update(v.id, { display_order: Number(x) })} />
-              <div className="sm:col-span-2">
-                <label className="text-xs font-medium text-muted-foreground">Description</label>
-                <textarea value={v.description ?? ""} onChange={(e) => update(v.id, { description: e.target.value })} className="mt-1 w-full rounded-md border border-input bg-background px-2 py-1.5 text-sm" rows={2} />
-              </div>
               <label className="flex items-center gap-2 text-sm">
                 <input type="checkbox" checked={v.active} onChange={(e) => update(v.id, { active: e.target.checked })} />
                 Active (visible on site)
               </label>
+              <div className="sm:col-span-2">
+                <label className="text-xs font-medium text-muted-foreground">Description</label>
+                <textarea value={v.description ?? ""} onChange={(e) => update(v.id, { description: e.target.value })} className="mt-1 w-full rounded-md border border-input bg-background px-2 py-1.5 text-sm" rows={2} />
+              </div>
             </div>
             <div className="flex md:flex-col gap-2">
               <button onClick={() => save(v)} className="p-2 rounded-lg bg-success text-success-foreground" title="Save"><Save className="w-4 h-4" /></button>
