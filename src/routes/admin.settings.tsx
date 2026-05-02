@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Loader2, Save } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { ImageUpload } from "@/components/ImageUpload";
 
 export const Route = createFileRoute("/admin/settings")({
   component: AdminSettings,
