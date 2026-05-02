@@ -65,7 +65,7 @@ function AdminSettings() {
       data?.forEach((row) => {
         if (row.key === "contact") setContact(row.value as ContactCfg);
         if (row.key === "payment") setPayment(row.value as PaymentCfg);
-        if (row.key === "hero") setHero(row.value as HeroCfg);
+        if (row.key === "hero") setHero({ title: "", subtitle: "", tagline: "", images: [], ...(row.value as Partial<HeroCfg>) });
         if (row.key === "landing") setLanding({ ...defaultLanding, ...(row.value as Partial<LandingCfg>) });
       });
       setLoading(false);
