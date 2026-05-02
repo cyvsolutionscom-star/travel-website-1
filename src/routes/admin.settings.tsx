@@ -8,7 +8,7 @@ export const Route = createFileRoute("/admin/settings")({
   component: AdminSettings,
 });
 
-type ContactCfg = { phones: string[]; email: string; whatsapp: string; address: string };
+type ContactCfg = { phones: string[]; email: string; whatsapp: string; address: string; map_embed_url: string };
 type PaymentCfg = { upi_id: string; qr_image: string; cod_enabled: boolean; note: string };
 type HeroCfg = { title: string; subtitle: string; tagline: string; images: string[] };
 type StatItem = { n: string; l: string };
