@@ -8,7 +8,7 @@ export const Route = createFileRoute("/admin/settings")({
   component: AdminSettings,
 });
 
-type ContactCfg = { phones: string[]; email: string; whatsapp: string; address: string };
+type ContactCfg = { phones: string[]; email: string; whatsapp: string; address: string; map_embed_url: string };
 type PaymentCfg = { upi_id: string; qr_image: string; cod_enabled: boolean; note: string };
 type HeroCfg = { title: string; subtitle: string; tagline: string; images: string[] };
 type StatItem = { n: string; l: string };
@@ -52,7 +52,7 @@ const defaultLanding: LandingCfg = {
 };
 
 function AdminSettings() {
-  const [contact, setContact] = useState<ContactCfg>({ phones: [], email: "", whatsapp: "", address: "" });
+  const [contact, setContact] = useState<ContactCfg>({ phones: [], email: "", whatsapp: "", address: "", map_embed_url: "" });
   const [payment, setPayment] = useState<PaymentCfg>({ upi_id: "", qr_image: "", cod_enabled: true, note: "" });
   const [hero, setHero] = useState<HeroCfg>({ title: "", subtitle: "", tagline: "", images: [] });
   const [landing, setLanding] = useState<LandingCfg>(defaultLanding);
@@ -63,7 +63,7 @@ function AdminSettings() {
     (async () => {
       const { data } = await supabase.from("site_settings").select("key,value");
       data?.forEach((row) => {
-        if (row.key === "contact") setContact(row.value as ContactCfg);
+        if (row.key === "contact") setContact({ phones: [], email: "", whatsapp: "", address: "", map_embed_url: "", ...(row.value as Partial<ContactCfg>) });
         if (row.key === "payment") setPayment(row.value as PaymentCfg);
         if (row.key === "hero") setHero({ title: "", subtitle: "", tagline: "", images: [], ...(row.value as Partial<HeroCfg>) });
         if (row.key === "landing") setLanding({ ...defaultLanding, ...(row.value as Partial<LandingCfg>) });
@@ -187,6 +187,17 @@ function AdminSettings() {
         <Field label="WhatsApp Number (with country code)" value={contact.whatsapp} onChange={(v) => setContact({ ...contact, whatsapp: v })} />
         <Field label="Email" value={contact.email} onChange={(v) => setContact({ ...contact, email: v })} />
         <Field label="Address" value={contact.address} onChange={(v) => setContact({ ...contact, address: v })} textarea />
+        <div className="pt-4 border-t border-border">
+          <Field label="Google Maps Embed URL" value={contact.map_embed_url} onChange={(v) => setContact({ ...contact, map_embed_url: v })} textarea />
+          <p className="text-xs text-muted-foreground mt-1">
+            Go to <a href="https://www.google.com/maps" target="_blank" rel="noopener" className="text-primary underline">Google Maps</a> → search your location → click <strong>Share</strong> → <strong>Embed a map</strong> → copy the <code>src="..."</code> URL and paste it here.
+          </p>
+          {contact.map_embed_url && (
+            <div className="mt-3 rounded-lg overflow-hidden border border-border">
+              <iframe src={contact.map_embed_url} width="100%" height="200" style={{ border: 0 }} loading="lazy" title="Map Preview" />
+            </div>
+          )}
+        </div>
       </Section>
 
       <Section title="Payment Options" saved={saved === "payment"} onSave={() => save("payment", payment)}>
