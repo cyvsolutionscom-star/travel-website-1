@@ -187,6 +187,17 @@ function AdminSettings() {
         <Field label="WhatsApp Number (with country code)" value={contact.whatsapp} onChange={(v) => setContact({ ...contact, whatsapp: v })} />
         <Field label="Email" value={contact.email} onChange={(v) => setContact({ ...contact, email: v })} />
         <Field label="Address" value={contact.address} onChange={(v) => setContact({ ...contact, address: v })} textarea />
+        <div className="pt-4 border-t border-border">
+          <Field label="Google Maps Embed URL" value={contact.map_embed_url} onChange={(v) => setContact({ ...contact, map_embed_url: v })} textarea />
+          <p className="text-xs text-muted-foreground mt-1">
+            Go to <a href="https://www.google.com/maps" target="_blank" rel="noopener" className="text-primary underline">Google Maps</a> → search your location → click <strong>Share</strong> → <strong>Embed a map</strong> → copy the <code>src="..."</code> URL and paste it here.
+          </p>
+          {contact.map_embed_url && (
+            <div className="mt-3 rounded-lg overflow-hidden border border-border">
+              <iframe src={contact.map_embed_url} width="100%" height="200" style={{ border: 0 }} loading="lazy" title="Map Preview" />
+            </div>
+          )}
+        </div>
       </Section>
 
       <Section title="Payment Options" saved={saved === "payment"} onSave={() => save("payment", payment)}>
