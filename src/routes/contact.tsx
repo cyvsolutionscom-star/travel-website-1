@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Phone, Mail, MapPin, Clock, MessageCircle } from "lucide-react";
 import { whatsappLink } from "@/lib/whatsapp";
+import { useSiteSetting } from "@/hooks/useSiteSetting";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
@@ -14,7 +15,12 @@ export const Route = createFileRoute("/contact")({
   component: ContactPage,
 });
 
+const defaultMapUrl = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15293.774!2d78.0094!3d15.0345!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bb5e7e1c9b7b6d5%3A0x2e4c9e8e8b8b8b8b!2sTadipatri%2C%20Andhra%20Pradesh!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin";
+
 function ContactPage() {
+  const { value: contact } = useSiteSetting<{ map_embed_url?: string }>("contact", {});
+  const mapUrl = contact.map_embed_url || defaultMapUrl;
+
   return (
     <div className="container mx-auto px-4 py-16">
       <div className="text-center max-w-2xl mx-auto mb-12">
@@ -60,11 +66,11 @@ function ContactPage() {
         </a>
       </div>
 
-      {/* Google Maps Embed */}
+      {/* Google Maps Embed — dynamic from admin settings */}
       <div className="mt-10 rounded-2xl overflow-hidden border border-border shadow-card">
         <iframe
           title="MNM Travels Location"
-          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15293.774!2d78.0094!3d15.0345!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bb5e7e1c9b7b6d5%3A0x2e4c9e8e8b8b8b8b!2sTadipatri%2C%20Andhra%20Pradesh!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin"
+          src={mapUrl}
           width="100%"
           height="400"
           style={{ border: 0 }}
