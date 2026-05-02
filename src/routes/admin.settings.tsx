@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Loader2, Save } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { ImageUpload } from "@/components/ImageUpload";
 
 export const Route = createFileRoute("/admin/settings")({
   component: AdminSettings,
@@ -9,7 +10,7 @@ export const Route = createFileRoute("/admin/settings")({
 
 type ContactCfg = { phones: string[]; email: string; whatsapp: string; address: string };
 type PaymentCfg = { upi_id: string; qr_image: string; cod_enabled: boolean; note: string };
-type HeroCfg = { title: string; subtitle: string; tagline: string };
+type HeroCfg = { title: string; subtitle: string; tagline: string; images: string[] };
 type StatItem = { n: string; l: string };
 type ServiceItem = { t: string; d: string };
 type LandingCfg = {
@@ -53,7 +54,7 @@ const defaultLanding: LandingCfg = {
 function AdminSettings() {
   const [contact, setContact] = useState<ContactCfg>({ phones: [], email: "", whatsapp: "", address: "" });
   const [payment, setPayment] = useState<PaymentCfg>({ upi_id: "", qr_image: "", cod_enabled: true, note: "" });
-  const [hero, setHero] = useState<HeroCfg>({ title: "", subtitle: "", tagline: "" });
+  const [hero, setHero] = useState<HeroCfg>({ title: "", subtitle: "", tagline: "", images: [] });
   const [landing, setLanding] = useState<LandingCfg>(defaultLanding);
   const [loading, setLoading] = useState(true);
   const [saved, setSaved] = useState("");
@@ -64,7 +65,7 @@ function AdminSettings() {
       data?.forEach((row) => {
         if (row.key === "contact") setContact(row.value as ContactCfg);
         if (row.key === "payment") setPayment(row.value as PaymentCfg);
-        if (row.key === "hero") setHero(row.value as HeroCfg);
+        if (row.key === "hero") setHero({ title: "", subtitle: "", tagline: "", images: [], ...(row.value as Partial<HeroCfg>) });
         if (row.key === "landing") setLanding({ ...defaultLanding, ...(row.value as Partial<LandingCfg>) });
       });
       setLoading(false);
@@ -87,6 +88,37 @@ function AdminSettings() {
         <Field label="Tagline" value={hero.tagline} onChange={(v) => setHero({ ...hero, tagline: v })} />
         <Field label="Title" value={hero.title} onChange={(v) => setHero({ ...hero, title: v })} />
         <Field label="Subtitle" value={hero.subtitle} onChange={(v) => setHero({ ...hero, subtitle: v })} />
+        <div className="pt-4 border-t border-border">
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="font-semibold text-sm">Hero Slideshow Images</h3>
+            <button
+              type="button"
+              onClick={() => setHero({ ...hero, images: [...hero.images, ""] })}
+              className="text-xs text-primary font-semibold"
+            >+ Add Slot</button>
+          </div>
+          <div className="grid grid-cols-3 gap-3">
+            {hero.images.map((img, i) => (
+              <div key={i} className="relative">
+                <ImageUpload
+                  value={img}
+                  onChange={(url) => {
+                    const next = [...hero.images];
+                    next[i] = url;
+                    setHero({ ...hero, images: next });
+                  }}
+                  folder="hero"
+                  className="aspect-video"
+                />
+                <button
+                  type="button"
+                  onClick={() => setHero({ ...hero, images: hero.images.filter((_, j) => j !== i) })}
+                  className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-destructive text-destructive-foreground text-xs grid place-items-center"
+                >×</button>
+              </div>
+            ))}
+          </div>
+        </div>
       </Section>
 
       <Section title="Landing — Fleet Section" saved={saved === "landing"} onSave={() => save("landing", landing)}>
