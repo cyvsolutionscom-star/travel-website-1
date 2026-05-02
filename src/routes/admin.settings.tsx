@@ -54,7 +54,7 @@ const defaultLanding: LandingCfg = {
 function AdminSettings() {
   const [contact, setContact] = useState<ContactCfg>({ phones: [], email: "", whatsapp: "", address: "" });
   const [payment, setPayment] = useState<PaymentCfg>({ upi_id: "", qr_image: "", cod_enabled: true, note: "" });
-  const [hero, setHero] = useState<HeroCfg>({ title: "", subtitle: "", tagline: "" });
+  const [hero, setHero] = useState<HeroCfg>({ title: "", subtitle: "", tagline: "", images: [] });
   const [landing, setLanding] = useState<LandingCfg>(defaultLanding);
   const [loading, setLoading] = useState(true);
   const [saved, setSaved] = useState("");
