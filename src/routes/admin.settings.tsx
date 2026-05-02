@@ -52,7 +52,7 @@ const defaultLanding: LandingCfg = {
 };
 
 function AdminSettings() {
-  const [contact, setContact] = useState<ContactCfg>({ phones: [], email: "", whatsapp: "", address: "" });
+  const [contact, setContact] = useState<ContactCfg>({ phones: [], email: "", whatsapp: "", address: "", map_embed_url: "" });
   const [payment, setPayment] = useState<PaymentCfg>({ upi_id: "", qr_image: "", cod_enabled: true, note: "" });
   const [hero, setHero] = useState<HeroCfg>({ title: "", subtitle: "", tagline: "", images: [] });
   const [landing, setLanding] = useState<LandingCfg>(defaultLanding);
