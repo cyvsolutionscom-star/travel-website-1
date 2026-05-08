@@ -13,6 +13,11 @@ type PaymentCfg = { upi_id: string; qr_image: string; cod_enabled: boolean; note
 type HeroCfg = { title: string; subtitle: string; tagline: string; images: string[] };
 type StatItem = { n: string; l: string };
 type ServiceItem = { t: string; d: string };
+type TestimonialItem = { name: string; text: string; rating: number; location: string };
+type WhyItem = { title: string; desc: string };
+type RouteItem = { from: string; to: string; price: string };
+type StepItem = { title: string; desc: string };
+type FaqItem = { q: string; a: string };
 type LandingCfg = {
   fleet_heading: string;
   fleet_subheading: string;
@@ -23,6 +28,20 @@ type LandingCfg = {
   cta_subheading: string;
   stats: StatItem[];
   services: ServiceItem[];
+  testimonials_heading: string;
+  testimonials: TestimonialItem[];
+  why_heading: string;
+  why_subtitle: string;
+  why_items: WhyItem[];
+  routes_heading: string;
+  routes_subtitle: string;
+  popular_routes: RouteItem[];
+  steps_heading: string;
+  steps_subtitle: string;
+  steps: StepItem[];
+  faq_heading: string;
+  faq_subtitle: string;
+  faqs: FaqItem[];
 };
 
 const defaultLanding: LandingCfg = {
