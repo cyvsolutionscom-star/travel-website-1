@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { ArrowRight, Shield, Clock, Users, Star, CheckCircle2, MessageCircle, Phone, Loader2 } from "lucide-react";
+import { ArrowRight, Shield, Clock, Users, Star, CheckCircle2, MessageCircle, Phone, Loader2, MapPin, ChevronDown, ChevronUp, Quote, Award } from "lucide-react";
 import hero1 from "@/assets/hero-1.jpg";
 import hero2 from "@/assets/hero-2.jpg";
 import hero3 from "@/assets/hero-3.jpg";
