@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { ArrowRight, Shield, Clock, Users, Star, CheckCircle2, MessageCircle, Phone, Loader2 } from "lucide-react";
+import { ArrowRight, Shield, Clock, Users, Star, CheckCircle2, MessageCircle, Phone, Loader2, MapPin, ChevronDown, ChevronUp, Quote, Award } from "lucide-react";
 import hero1 from "@/assets/hero-1.jpg";
 import hero2 from "@/assets/hero-2.jpg";
 import hero3 from "@/assets/hero-3.jpg";
@@ -35,6 +35,11 @@ type Vehicle = {
 
 type StatItem = { n: string; l: string };
 type ServiceItem = { t: string; d: string };
+type TestimonialItem = { name: string; text: string; rating: number; location: string };
+type WhyItem = { title: string; desc: string };
+type RouteItem = { from: string; to: string; price: string };
+type StepItem = { title: string; desc: string };
+type FaqItem = { q: string; a: string };
 type LandingCfg = {
   fleet_heading: string;
   fleet_subheading: string;
@@ -45,6 +50,20 @@ type LandingCfg = {
   cta_subheading: string;
   stats: StatItem[];
   services: ServiceItem[];
+  testimonials_heading: string;
+  testimonials: TestimonialItem[];
+  why_heading: string;
+  why_subtitle: string;
+  why_items: WhyItem[];
+  routes_heading: string;
+  routes_subtitle: string;
+  popular_routes: RouteItem[];
+  steps_heading: string;
+  steps_subtitle: string;
+  steps: StepItem[];
+  faq_heading: string;
+  faq_subtitle: string;
+  faqs: FaqItem[];
 };
 
 const defaultLanding: LandingCfg = {
@@ -70,6 +89,46 @@ const defaultLanding: LandingCfg = {
     { t: "Hourly Rentals", d: "Flexible packages for short trips" },
     { t: "Safe & Insured", d: "Fully insured fleet, experienced drivers" },
     { t: "24/7 Support", d: "Round-the-clock customer support" },
+  ],
+  testimonials_heading: "What Our Customers Say",
+  testimonials: [
+    { name: "Ravi Kumar", text: "Excellent service! The car was clean and the driver was very professional.", rating: 5, location: "Hyderabad" },
+    { name: "Priya Sharma", text: "Best travel agency in Tadipatri. Very affordable and reliable.", rating: 5, location: "Bangalore" },
+    { name: "Suresh Reddy", text: "Booked a tempo traveller for pilgrimage. Great experience!", rating: 4, location: "Anantapur" },
+  ],
+  why_heading: "Why Choose MNM Travels?",
+  why_subtitle: "We go the extra mile to make your journey comfortable and memorable.",
+  why_items: [
+    { title: "Experienced Drivers", desc: "All our drivers are professionally trained with 5+ years of experience." },
+    { title: "Well-Maintained Fleet", desc: "Every vehicle is serviced regularly and kept in top condition." },
+    { title: "Transparent Pricing", desc: "No hidden charges. What you see is what you pay." },
+    { title: "Pan-India Coverage", desc: "We cover all major cities and pilgrimage routes across India." },
+  ],
+  routes_heading: "Popular Routes",
+  routes_subtitle: "Frequently booked travel routes from Tadipatri",
+  popular_routes: [
+    { from: "Tadipatri", to: "Hyderabad", price: "₹4,500" },
+    { from: "Tadipatri", to: "Bangalore", price: "₹6,000" },
+    { from: "Tadipatri", to: "Tirupati", price: "₹5,500" },
+    { from: "Tadipatri", to: "Chennai", price: "₹8,000" },
+    { from: "Anantapur", to: "Hyderabad", price: "₹4,000" },
+    { from: "Tadipatri", to: "Mantralayam", price: "₹2,500" },
+  ],
+  steps_heading: "How It Works",
+  steps_subtitle: "Book your ride in 3 simple steps",
+  steps: [
+    { title: "Choose Your Vehicle", desc: "Browse our fleet and pick the vehicle that suits your trip." },
+    { title: "Book via WhatsApp", desc: "Send us your travel details on WhatsApp — date, time, route." },
+    { title: "Enjoy Your Ride", desc: "Our driver picks you up on time. Sit back and enjoy the journey!" },
+  ],
+  faq_heading: "Frequently Asked Questions",
+  faq_subtitle: "Got questions? We've got answers.",
+  faqs: [
+    { q: "What are your operating hours?", a: "We operate 24/7. You can book a ride anytime." },
+    { q: "Do you provide outstation trips?", a: "Yes! We cover all major cities across India." },
+    { q: "Is there a driver included?", a: "Yes, all our rentals include an experienced driver." },
+    { q: "What payment methods do you accept?", a: "We accept UPI, bank transfer, cash, and online payments." },
+    { q: "Can I cancel my booking?", a: "Yes, free cancellation up to 24 hours before the trip." },
   ],
 };
 
@@ -275,7 +334,127 @@ function HomePage() {
         </div>
       </section>
 
-      {/* CTA */}
+      {/* TESTIMONIALS */}
+      <section className="bg-muted py-20">
+        <div className="container mx-auto px-4">
+          <div className="text-center max-w-2xl mx-auto mb-14">
+            <span className="text-secondary font-bold text-sm uppercase tracking-widest">Testimonials</span>
+            <h2 className="font-display text-4xl md:text-5xl mt-2">{landing.testimonials_heading}</h2>
+          </div>
+          <div className="grid md:grid-cols-3 gap-6">
+            {landing.testimonials.map((t, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="p-6 rounded-2xl bg-card border border-border shadow-card"
+              >
+                <Quote className="w-8 h-8 text-secondary/40 mb-3" />
+                <p className="text-muted-foreground text-sm leading-relaxed">{t.text}</p>
+                <div className="mt-4 flex items-center gap-1 text-secondary">
+                  {Array.from({ length: t.rating }).map((_, j) => (
+                    <Star key={j} className="w-4 h-4 fill-current" />
+                  ))}
+                </div>
+                <div className="mt-3 flex items-center justify-between">
+                  <div className="font-semibold text-sm">{t.name}</div>
+                  <div className="text-xs text-muted-foreground flex items-center gap-1"><MapPin className="w-3 h-3" />{t.location}</div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* WHY CHOOSE US */}
+      <section className="container mx-auto px-4 py-20">
+        <div className="text-center max-w-2xl mx-auto mb-14">
+          <span className="text-secondary font-bold text-sm uppercase tracking-widest">Why Us</span>
+          <h2 className="font-display text-4xl md:text-5xl mt-2">{landing.why_heading}</h2>
+          <p className="mt-4 text-muted-foreground">{landing.why_subtitle}</p>
+        </div>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          {landing.why_items.map((w, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.08 }}
+              className="text-center p-6 rounded-2xl bg-card border border-border shadow-card hover:shadow-elegant hover:-translate-y-1 transition-smooth"
+            >
+              <Award className="w-10 h-10 text-secondary mx-auto mb-4" />
+              <h3 className="font-semibold text-lg">{w.title}</h3>
+              <p className="text-sm text-muted-foreground mt-2">{w.desc}</p>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* POPULAR ROUTES */}
+      <section className="bg-muted py-20">
+        <div className="container mx-auto px-4">
+          <div className="text-center max-w-2xl mx-auto mb-14">
+            <span className="text-secondary font-bold text-sm uppercase tracking-widest">Routes</span>
+            <h2 className="font-display text-4xl md:text-5xl mt-2">{landing.routes_heading}</h2>
+            <p className="mt-4 text-muted-foreground">{landing.routes_subtitle}</p>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {landing.popular_routes.map((r, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, scale: 0.95 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.05 }}
+                className="flex items-center justify-between p-5 rounded-2xl bg-card border border-border shadow-card hover:shadow-elegant transition-smooth"
+              >
+                <div className="flex items-center gap-3">
+                  <MapPin className="w-5 h-5 text-primary shrink-0" />
+                  <div>
+                    <div className="font-semibold text-sm">{r.from} → {r.to}</div>
+                  </div>
+                </div>
+                <div className="font-display text-lg text-primary font-bold">{r.price}</div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* HOW IT WORKS */}
+      <section className="container mx-auto px-4 py-20">
+        <div className="text-center max-w-2xl mx-auto mb-14">
+          <span className="text-secondary font-bold text-sm uppercase tracking-widest">Process</span>
+          <h2 className="font-display text-4xl md:text-5xl mt-2">{landing.steps_heading}</h2>
+          <p className="mt-4 text-muted-foreground">{landing.steps_subtitle}</p>
+        </div>
+        <div className="grid md:grid-cols-3 gap-8">
+          {landing.steps.map((s, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.15 }}
+              className="text-center"
+            >
+              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-primary/60 text-primary-foreground grid place-items-center mx-auto mb-4 text-2xl font-bold font-display shadow-card">
+                {i + 1}
+              </div>
+              <h3 className="font-display text-xl font-semibold">{s.title}</h3>
+              <p className="text-sm text-muted-foreground mt-2 max-w-xs mx-auto">{s.desc}</p>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <FaqSection heading={landing.faq_heading} subtitle={landing.faq_subtitle} faqs={landing.faqs} />
+
+
       <section className="container mx-auto px-4 pb-20">
         <div className="rounded-3xl bg-gradient-primary p-10 md:p-16 text-primary-foreground shadow-elegant relative overflow-hidden">
           <Star className="absolute -top-8 -right-8 w-48 h-48 text-secondary/20" />
@@ -294,5 +473,34 @@ function HomePage() {
         </div>
       </section>
     </div>
+  );
+}
+
+function FaqSection({ heading, subtitle, faqs }: { heading: string; subtitle: string; faqs: FaqItem[] }) {
+  const [open, setOpen] = useState<number | null>(null);
+  return (
+    <section className="container mx-auto px-4 py-20">
+      <div className="text-center max-w-2xl mx-auto mb-14">
+        <span className="text-secondary font-bold text-sm uppercase tracking-widest">FAQ</span>
+        <h2 className="font-display text-4xl md:text-5xl mt-2">{heading}</h2>
+        <p className="mt-4 text-muted-foreground">{subtitle}</p>
+      </div>
+      <div className="max-w-2xl mx-auto space-y-3">
+        {faqs.map((f, i) => (
+          <div key={i} className="rounded-2xl bg-card border border-border shadow-card overflow-hidden">
+            <button
+              onClick={() => setOpen(open === i ? null : i)}
+              className="w-full flex items-center justify-between p-5 text-left font-semibold"
+            >
+              {f.q}
+              {open === i ? <ChevronUp className="w-5 h-5 text-muted-foreground shrink-0" /> : <ChevronDown className="w-5 h-5 text-muted-foreground shrink-0" />}
+            </button>
+            {open === i && (
+              <div className="px-5 pb-5 text-sm text-muted-foreground">{f.a}</div>
+            )}
+          </div>
+        ))}
+      </div>
+    </section>
   );
 }
