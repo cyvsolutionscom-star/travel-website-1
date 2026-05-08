@@ -68,6 +68,46 @@ const defaultLanding: LandingCfg = {
     { t: "Safe & Insured", d: "Fully insured fleet, experienced drivers" },
     { t: "24/7 Support", d: "Round-the-clock customer support" },
   ],
+  testimonials_heading: "What Our Customers Say",
+  testimonials: [
+    { name: "Ravi Kumar", text: "Excellent service! The car was clean and the driver was very professional.", rating: 5, location: "Hyderabad" },
+    { name: "Priya Sharma", text: "Best travel agency in Tadipatri. Very affordable and reliable.", rating: 5, location: "Bangalore" },
+    { name: "Suresh Reddy", text: "Booked a tempo traveller for pilgrimage. Great experience!", rating: 4, location: "Anantapur" },
+  ],
+  why_heading: "Why Choose MNM Travels?",
+  why_subtitle: "We go the extra mile to make your journey comfortable and memorable.",
+  why_items: [
+    { title: "Experienced Drivers", desc: "All our drivers are professionally trained with 5+ years of experience." },
+    { title: "Well-Maintained Fleet", desc: "Every vehicle is serviced regularly and kept in top condition." },
+    { title: "Transparent Pricing", desc: "No hidden charges. What you see is what you pay." },
+    { title: "Pan-India Coverage", desc: "We cover all major cities and pilgrimage routes across India." },
+  ],
+  routes_heading: "Popular Routes",
+  routes_subtitle: "Frequently booked travel routes from Tadipatri",
+  popular_routes: [
+    { from: "Tadipatri", to: "Hyderabad", price: "₹4,500" },
+    { from: "Tadipatri", to: "Bangalore", price: "₹6,000" },
+    { from: "Tadipatri", to: "Tirupati", price: "₹5,500" },
+    { from: "Tadipatri", to: "Chennai", price: "₹8,000" },
+    { from: "Anantapur", to: "Hyderabad", price: "₹4,000" },
+    { from: "Tadipatri", to: "Mantralayam", price: "₹2,500" },
+  ],
+  steps_heading: "How It Works",
+  steps_subtitle: "Book your ride in 3 simple steps",
+  steps: [
+    { title: "Choose Your Vehicle", desc: "Browse our fleet and pick the vehicle that suits your trip." },
+    { title: "Book via WhatsApp", desc: "Send us your travel details on WhatsApp — date, time, route." },
+    { title: "Enjoy Your Ride", desc: "Our driver picks you up on time. Sit back and enjoy the journey!" },
+  ],
+  faq_heading: "Frequently Asked Questions",
+  faq_subtitle: "Got questions? We've got answers.",
+  faqs: [
+    { q: "What are your operating hours?", a: "We operate 24/7. You can book a ride anytime." },
+    { q: "Do you provide outstation trips?", a: "Yes! We cover all major cities across India." },
+    { q: "Is there a driver included?", a: "Yes, all our rentals include an experienced driver." },
+    { q: "What payment methods do you accept?", a: "We accept UPI, bank transfer, cash, and online payments." },
+    { q: "Can I cancel my booking?", a: "Yes, free cancellation up to 24 hours before the trip." },
+  ],
 };
 
 function AdminSettings() {
