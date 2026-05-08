@@ -475,3 +475,32 @@ function HomePage() {
     </div>
   );
 }
+
+function FaqSection({ heading, subtitle, faqs }: { heading: string; subtitle: string; faqs: FaqItem[] }) {
+  const [open, setOpen] = useState<number | null>(null);
+  return (
+    <section className="container mx-auto px-4 py-20">
+      <div className="text-center max-w-2xl mx-auto mb-14">
+        <span className="text-secondary font-bold text-sm uppercase tracking-widest">FAQ</span>
+        <h2 className="font-display text-4xl md:text-5xl mt-2">{heading}</h2>
+        <p className="mt-4 text-muted-foreground">{subtitle}</p>
+      </div>
+      <div className="max-w-2xl mx-auto space-y-3">
+        {faqs.map((f, i) => (
+          <div key={i} className="rounded-2xl bg-card border border-border shadow-card overflow-hidden">
+            <button
+              onClick={() => setOpen(open === i ? null : i)}
+              className="w-full flex items-center justify-between p-5 text-left font-semibold"
+            >
+              {f.q}
+              {open === i ? <ChevronUp className="w-5 h-5 text-muted-foreground shrink-0" /> : <ChevronDown className="w-5 h-5 text-muted-foreground shrink-0" />}
+            </button>
+            {open === i && (
+              <div className="px-5 pb-5 text-sm text-muted-foreground">{f.a}</div>
+            )}
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
