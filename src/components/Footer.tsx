@@ -49,7 +49,7 @@ export function Footer() {
         </div>
       </div>
       <div className="border-t border-primary-foreground/10 py-5 text-center text-xs text-primary-foreground/60">
-        © {new Date().getFullYear()} MNM Travels. All rights reserved.
+        © 2025 MNM Travels. All rights reserved.
       </div>
     </footer>
   );
