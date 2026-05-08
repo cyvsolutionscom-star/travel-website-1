@@ -239,6 +239,100 @@ function AdminSettings() {
           <Field label="Final CTA Heading" value={landing.cta_heading} onChange={(v) => setLanding({ ...landing, cta_heading: v })} />
           <Field label="Final CTA Subheading" value={landing.cta_subheading} onChange={(v) => setLanding({ ...landing, cta_subheading: v })} textarea />
         </div>
+
+        {/* Testimonials */}
+        <div className="pt-4 border-t border-border">
+          <Field label="Testimonials Heading" value={landing.testimonials_heading} onChange={(v) => setLanding({ ...landing, testimonials_heading: v })} />
+          <div className="flex items-center justify-between mt-3 mb-2">
+            <h3 className="font-semibold text-sm">Testimonials</h3>
+            <button type="button" onClick={() => setLanding({ ...landing, testimonials: [...landing.testimonials, { name: "", text: "", rating: 5, location: "" }] })} className="text-xs text-primary font-semibold">+ Add</button>
+          </div>
+          {landing.testimonials.map((t, i) => (
+            <div key={i} className="grid grid-cols-1 gap-2 mb-3 p-3 rounded-lg bg-muted/50">
+              <div className="grid grid-cols-2 gap-2">
+                <input value={t.name} onChange={(e) => { const next = [...landing.testimonials]; next[i] = { ...next[i], name: e.target.value }; setLanding({ ...landing, testimonials: next }); }} placeholder="Name" className="rounded-md border border-input bg-background px-2 py-1.5 text-sm" />
+                <input value={t.location} onChange={(e) => { const next = [...landing.testimonials]; next[i] = { ...next[i], location: e.target.value }; setLanding({ ...landing, testimonials: next }); }} placeholder="Location" className="rounded-md border border-input bg-background px-2 py-1.5 text-sm" />
+              </div>
+              <textarea value={t.text} onChange={(e) => { const next = [...landing.testimonials]; next[i] = { ...next[i], text: e.target.value }; setLanding({ ...landing, testimonials: next }); }} placeholder="Review text" rows={2} className="rounded-md border border-input bg-background px-2 py-1.5 text-sm" />
+              <div className="flex items-center gap-2">
+                <label className="text-xs text-muted-foreground">Rating:</label>
+                <select value={t.rating} onChange={(e) => { const next = [...landing.testimonials]; next[i] = { ...next[i], rating: Number(e.target.value) }; setLanding({ ...landing, testimonials: next }); }} className="rounded-md border border-input bg-background px-2 py-1 text-sm">
+                  {[5,4,3,2,1].map(r => <option key={r} value={r}>{r} ★</option>)}
+                </select>
+                <button type="button" onClick={() => setLanding({ ...landing, testimonials: landing.testimonials.filter((_, j) => j !== i) })} className="ml-auto text-destructive text-xs font-semibold px-2">× Remove</button>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Why Choose Us */}
+        <div className="pt-4 border-t border-border">
+          <Field label="Why Choose Us — Heading" value={landing.why_heading} onChange={(v) => setLanding({ ...landing, why_heading: v })} />
+          <Field label="Why Choose Us — Subtitle" value={landing.why_subtitle} onChange={(v) => setLanding({ ...landing, why_subtitle: v })} textarea />
+          <div className="flex items-center justify-between mt-3 mb-2">
+            <h3 className="font-semibold text-sm">Reasons</h3>
+            <button type="button" onClick={() => setLanding({ ...landing, why_items: [...landing.why_items, { title: "", desc: "" }] })} className="text-xs text-primary font-semibold">+ Add</button>
+          </div>
+          {landing.why_items.map((w, i) => (
+            <div key={i} className="grid grid-cols-[1fr_2fr_auto] gap-2 mb-2 items-center">
+              <input value={w.title} onChange={(e) => { const next = [...landing.why_items]; next[i] = { ...next[i], title: e.target.value }; setLanding({ ...landing, why_items: next }); }} placeholder="Title" className="rounded-md border border-input bg-background px-2 py-1.5 text-sm" />
+              <input value={w.desc} onChange={(e) => { const next = [...landing.why_items]; next[i] = { ...next[i], desc: e.target.value }; setLanding({ ...landing, why_items: next }); }} placeholder="Description" className="rounded-md border border-input bg-background px-2 py-1.5 text-sm" />
+              <button type="button" onClick={() => setLanding({ ...landing, why_items: landing.why_items.filter((_, j) => j !== i) })} className="text-destructive text-xs font-semibold px-2">×</button>
+            </div>
+          ))}
+        </div>
+
+        {/* Popular Routes */}
+        <div className="pt-4 border-t border-border">
+          <Field label="Popular Routes — Heading" value={landing.routes_heading} onChange={(v) => setLanding({ ...landing, routes_heading: v })} />
+          <Field label="Popular Routes — Subtitle" value={landing.routes_subtitle} onChange={(v) => setLanding({ ...landing, routes_subtitle: v })} textarea />
+          <div className="flex items-center justify-between mt-3 mb-2">
+            <h3 className="font-semibold text-sm">Routes</h3>
+            <button type="button" onClick={() => setLanding({ ...landing, popular_routes: [...landing.popular_routes, { from: "", to: "", price: "" }] })} className="text-xs text-primary font-semibold">+ Add</button>
+          </div>
+          {landing.popular_routes.map((r, i) => (
+            <div key={i} className="grid grid-cols-[1fr_1fr_1fr_auto] gap-2 mb-2 items-center">
+              <input value={r.from} onChange={(e) => { const next = [...landing.popular_routes]; next[i] = { ...next[i], from: e.target.value }; setLanding({ ...landing, popular_routes: next }); }} placeholder="From" className="rounded-md border border-input bg-background px-2 py-1.5 text-sm" />
+              <input value={r.to} onChange={(e) => { const next = [...landing.popular_routes]; next[i] = { ...next[i], to: e.target.value }; setLanding({ ...landing, popular_routes: next }); }} placeholder="To" className="rounded-md border border-input bg-background px-2 py-1.5 text-sm" />
+              <input value={r.price} onChange={(e) => { const next = [...landing.popular_routes]; next[i] = { ...next[i], price: e.target.value }; setLanding({ ...landing, popular_routes: next }); }} placeholder="₹4,500" className="rounded-md border border-input bg-background px-2 py-1.5 text-sm" />
+              <button type="button" onClick={() => setLanding({ ...landing, popular_routes: landing.popular_routes.filter((_, j) => j !== i) })} className="text-destructive text-xs font-semibold px-2">×</button>
+            </div>
+          ))}
+        </div>
+
+        {/* How It Works */}
+        <div className="pt-4 border-t border-border">
+          <Field label="How It Works — Heading" value={landing.steps_heading} onChange={(v) => setLanding({ ...landing, steps_heading: v })} />
+          <Field label="How It Works — Subtitle" value={landing.steps_subtitle} onChange={(v) => setLanding({ ...landing, steps_subtitle: v })} textarea />
+          <div className="flex items-center justify-between mt-3 mb-2">
+            <h3 className="font-semibold text-sm">Steps</h3>
+            <button type="button" onClick={() => setLanding({ ...landing, steps: [...landing.steps, { title: "", desc: "" }] })} className="text-xs text-primary font-semibold">+ Add</button>
+          </div>
+          {landing.steps.map((s, i) => (
+            <div key={i} className="grid grid-cols-[1fr_2fr_auto] gap-2 mb-2 items-center">
+              <input value={s.title} onChange={(e) => { const next = [...landing.steps]; next[i] = { ...next[i], title: e.target.value }; setLanding({ ...landing, steps: next }); }} placeholder="Step title" className="rounded-md border border-input bg-background px-2 py-1.5 text-sm" />
+              <input value={s.desc} onChange={(e) => { const next = [...landing.steps]; next[i] = { ...next[i], desc: e.target.value }; setLanding({ ...landing, steps: next }); }} placeholder="Description" className="rounded-md border border-input bg-background px-2 py-1.5 text-sm" />
+              <button type="button" onClick={() => setLanding({ ...landing, steps: landing.steps.filter((_, j) => j !== i) })} className="text-destructive text-xs font-semibold px-2">×</button>
+            </div>
+          ))}
+        </div>
+
+        {/* FAQ */}
+        <div className="pt-4 border-t border-border">
+          <Field label="FAQ — Heading" value={landing.faq_heading} onChange={(v) => setLanding({ ...landing, faq_heading: v })} />
+          <Field label="FAQ — Subtitle" value={landing.faq_subtitle} onChange={(v) => setLanding({ ...landing, faq_subtitle: v })} textarea />
+          <div className="flex items-center justify-between mt-3 mb-2">
+            <h3 className="font-semibold text-sm">Questions</h3>
+            <button type="button" onClick={() => setLanding({ ...landing, faqs: [...landing.faqs, { q: "", a: "" }] })} className="text-xs text-primary font-semibold">+ Add</button>
+          </div>
+          {landing.faqs.map((f, i) => (
+            <div key={i} className="grid grid-cols-1 gap-2 mb-3 p-3 rounded-lg bg-muted/50">
+              <input value={f.q} onChange={(e) => { const next = [...landing.faqs]; next[i] = { ...next[i], q: e.target.value }; setLanding({ ...landing, faqs: next }); }} placeholder="Question" className="rounded-md border border-input bg-background px-2 py-1.5 text-sm" />
+              <textarea value={f.a} onChange={(e) => { const next = [...landing.faqs]; next[i] = { ...next[i], a: e.target.value }; setLanding({ ...landing, faqs: next }); }} placeholder="Answer" rows={2} className="rounded-md border border-input bg-background px-2 py-1.5 text-sm" />
+              <button type="button" onClick={() => setLanding({ ...landing, faqs: landing.faqs.filter((_, j) => j !== i) })} className="text-destructive text-xs font-semibold px-2 text-left">× Remove</button>
+            </div>
+          ))}
+        </div>
       </Section>
 
       <Section title="Contact Info" saved={saved === "contact"} onSave={() => save("contact", contact)}>
