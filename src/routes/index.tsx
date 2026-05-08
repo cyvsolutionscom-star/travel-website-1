@@ -411,23 +411,42 @@ function HomePage() {
             <h2 className="font-display text-4xl md:text-5xl mt-2">{landing.routes_heading}</h2>
             <p className="mt-4 text-muted-foreground">{landing.routes_subtitle}</p>
           </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {landing.popular_routes.map((r, i) => (
               <motion.div
                 key={i}
                 initial={{ opacity: 0, scale: 0.95 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
-                transition={{ delay: i * 0.05 }}
-                className="flex items-center justify-between p-5 rounded-2xl bg-card border border-border shadow-card hover:shadow-elegant transition-smooth"
+                transition={{ delay: i * 0.04 }}
+                className="overflow-hidden rounded-2xl bg-card border border-border shadow-card hover:shadow-elegant hover:-translate-y-1 transition-smooth"
               >
-                <div className="flex items-center gap-3">
-                  <MapPin className="w-5 h-5 text-primary shrink-0" />
-                  <div>
-                    <div className="font-semibold text-sm">{r.from} → {r.to}</div>
-                  </div>
+                <div className="aspect-[16/10] bg-muted overflow-hidden">
+                  {r.image ? (
+                    <img src={r.image} alt={`${r.from} to ${r.to}`} className="w-full h-full object-cover" loading="lazy" />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-primary/10 to-secondary/10 grid place-items-center">
+                      <MapPin className="w-8 h-8 text-primary/30" />
+                    </div>
+                  )}
                 </div>
-                <div className="font-display text-lg text-primary font-bold">{r.price}</div>
+                <div className="p-4">
+                  <div className="flex items-center gap-2 text-sm">
+                    <MapPin className="w-4 h-4 text-primary shrink-0" />
+                    <span className="font-semibold">{r.from}</span>
+                    <ArrowRight className="w-3 h-3 text-muted-foreground" />
+                    <span className="font-semibold">{r.to}</span>
+                  </div>
+                  <div className="mt-2 font-display text-xl text-primary font-bold">{r.price}</div>
+                  <a
+                    href={whatsappLink(`Hi, I want to book ${r.from} to ${r.to} trip.`)}
+                    target="_blank"
+                    rel="noopener"
+                    className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-full bg-success px-4 py-2.5 text-sm font-bold text-success-foreground hover:scale-[1.02] transition-smooth"
+                  >
+                    <MessageCircle className="w-4 h-4" /> Book Now
+                  </a>
+                </div>
               </motion.div>
             ))}
           </div>
