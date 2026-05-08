@@ -334,7 +334,127 @@ function HomePage() {
         </div>
       </section>
 
-      {/* CTA */}
+      {/* TESTIMONIALS */}
+      <section className="bg-muted py-20">
+        <div className="container mx-auto px-4">
+          <div className="text-center max-w-2xl mx-auto mb-14">
+            <span className="text-secondary font-bold text-sm uppercase tracking-widest">Testimonials</span>
+            <h2 className="font-display text-4xl md:text-5xl mt-2">{landing.testimonials_heading}</h2>
+          </div>
+          <div className="grid md:grid-cols-3 gap-6">
+            {landing.testimonials.map((t, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="p-6 rounded-2xl bg-card border border-border shadow-card"
+              >
+                <Quote className="w-8 h-8 text-secondary/40 mb-3" />
+                <p className="text-muted-foreground text-sm leading-relaxed">{t.text}</p>
+                <div className="mt-4 flex items-center gap-1 text-secondary">
+                  {Array.from({ length: t.rating }).map((_, j) => (
+                    <Star key={j} className="w-4 h-4 fill-current" />
+                  ))}
+                </div>
+                <div className="mt-3 flex items-center justify-between">
+                  <div className="font-semibold text-sm">{t.name}</div>
+                  <div className="text-xs text-muted-foreground flex items-center gap-1"><MapPin className="w-3 h-3" />{t.location}</div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* WHY CHOOSE US */}
+      <section className="container mx-auto px-4 py-20">
+        <div className="text-center max-w-2xl mx-auto mb-14">
+          <span className="text-secondary font-bold text-sm uppercase tracking-widest">Why Us</span>
+          <h2 className="font-display text-4xl md:text-5xl mt-2">{landing.why_heading}</h2>
+          <p className="mt-4 text-muted-foreground">{landing.why_subtitle}</p>
+        </div>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          {landing.why_items.map((w, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.08 }}
+              className="text-center p-6 rounded-2xl bg-card border border-border shadow-card hover:shadow-elegant hover:-translate-y-1 transition-smooth"
+            >
+              <Award className="w-10 h-10 text-secondary mx-auto mb-4" />
+              <h3 className="font-semibold text-lg">{w.title}</h3>
+              <p className="text-sm text-muted-foreground mt-2">{w.desc}</p>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* POPULAR ROUTES */}
+      <section className="bg-muted py-20">
+        <div className="container mx-auto px-4">
+          <div className="text-center max-w-2xl mx-auto mb-14">
+            <span className="text-secondary font-bold text-sm uppercase tracking-widest">Routes</span>
+            <h2 className="font-display text-4xl md:text-5xl mt-2">{landing.routes_heading}</h2>
+            <p className="mt-4 text-muted-foreground">{landing.routes_subtitle}</p>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {landing.popular_routes.map((r, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, scale: 0.95 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.05 }}
+                className="flex items-center justify-between p-5 rounded-2xl bg-card border border-border shadow-card hover:shadow-elegant transition-smooth"
+              >
+                <div className="flex items-center gap-3">
+                  <MapPin className="w-5 h-5 text-primary shrink-0" />
+                  <div>
+                    <div className="font-semibold text-sm">{r.from} → {r.to}</div>
+                  </div>
+                </div>
+                <div className="font-display text-lg text-primary font-bold">{r.price}</div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* HOW IT WORKS */}
+      <section className="container mx-auto px-4 py-20">
+        <div className="text-center max-w-2xl mx-auto mb-14">
+          <span className="text-secondary font-bold text-sm uppercase tracking-widest">Process</span>
+          <h2 className="font-display text-4xl md:text-5xl mt-2">{landing.steps_heading}</h2>
+          <p className="mt-4 text-muted-foreground">{landing.steps_subtitle}</p>
+        </div>
+        <div className="grid md:grid-cols-3 gap-8">
+          {landing.steps.map((s, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.15 }}
+              className="text-center"
+            >
+              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-primary/60 text-primary-foreground grid place-items-center mx-auto mb-4 text-2xl font-bold font-display shadow-card">
+                {i + 1}
+              </div>
+              <h3 className="font-display text-xl font-semibold">{s.title}</h3>
+              <p className="text-sm text-muted-foreground mt-2 max-w-xs mx-auto">{s.desc}</p>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <FaqSection heading={landing.faq_heading} subtitle={landing.faq_subtitle} faqs={landing.faqs} />
+
+
       <section className="container mx-auto px-4 pb-20">
         <div className="rounded-3xl bg-gradient-primary p-10 md:p-16 text-primary-foreground shadow-elegant relative overflow-hidden">
           <Star className="absolute -top-8 -right-8 w-48 h-48 text-secondary/20" />
