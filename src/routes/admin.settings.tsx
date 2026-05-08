@@ -15,7 +15,7 @@ type StatItem = { n: string; l: string };
 type ServiceItem = { t: string; d: string };
 type TestimonialItem = { name: string; text: string; rating: number; location: string };
 type WhyItem = { title: string; desc: string };
-type RouteItem = { from: string; to: string; price: string };
+type RouteItem = { from: string; to: string; price: string; image?: string };
 type StepItem = { title: string; desc: string };
 type FaqItem = { q: string; a: string };
 type LandingCfg = {
@@ -91,6 +91,16 @@ const defaultLanding: LandingCfg = {
     { from: "Tadipatri", to: "Chennai", price: "₹8,000" },
     { from: "Anantapur", to: "Hyderabad", price: "₹4,000" },
     { from: "Tadipatri", to: "Mantralayam", price: "₹2,500" },
+    { from: "Tadipatri", to: "Goa", price: "₹12,000" },
+    { from: "Tadipatri", to: "Mumbai", price: "₹15,000" },
+    { from: "Tadipatri", to: "Vijayawada", price: "₹5,000" },
+    { from: "Tadipatri", to: "Srisailam", price: "₹3,500" },
+    { from: "Anantapur", to: "Bangalore", price: "₹5,500" },
+    { from: "Tadipatri", to: "Kurnool", price: "₹2,000" },
+    { from: "Tadipatri", to: "Kadapa", price: "₹2,500" },
+    { from: "Tadipatri", to: "Vizag", price: "₹8,500" },
+    { from: "Tadipatri", to: "Hampi", price: "₹4,000" },
+    { from: "Tadipatri", to: "Shirdi", price: "₹10,000" },
   ],
   steps_heading: "How It Works",
   steps_subtitle: "Book your ride in 3 simple steps",
@@ -291,11 +301,19 @@ function AdminSettings() {
             <button type="button" onClick={() => setLanding({ ...landing, popular_routes: [...landing.popular_routes, { from: "", to: "", price: "" }] })} className="text-xs text-primary font-semibold">+ Add</button>
           </div>
           {landing.popular_routes.map((r, i) => (
-            <div key={i} className="grid grid-cols-[1fr_1fr_1fr_auto] gap-2 mb-2 items-center">
-              <input value={r.from} onChange={(e) => { const next = [...landing.popular_routes]; next[i] = { ...next[i], from: e.target.value }; setLanding({ ...landing, popular_routes: next }); }} placeholder="From" className="rounded-md border border-input bg-background px-2 py-1.5 text-sm" />
-              <input value={r.to} onChange={(e) => { const next = [...landing.popular_routes]; next[i] = { ...next[i], to: e.target.value }; setLanding({ ...landing, popular_routes: next }); }} placeholder="To" className="rounded-md border border-input bg-background px-2 py-1.5 text-sm" />
-              <input value={r.price} onChange={(e) => { const next = [...landing.popular_routes]; next[i] = { ...next[i], price: e.target.value }; setLanding({ ...landing, popular_routes: next }); }} placeholder="₹4,500" className="rounded-md border border-input bg-background px-2 py-1.5 text-sm" />
-              <button type="button" onClick={() => setLanding({ ...landing, popular_routes: landing.popular_routes.filter((_, j) => j !== i) })} className="text-destructive text-xs font-semibold px-2">×</button>
+            <div key={i} className="mb-3 p-3 rounded-lg bg-muted/50">
+              <div className="grid grid-cols-[1fr_1fr_1fr_auto] gap-2 mb-2 items-center">
+                <input value={r.from} onChange={(e) => { const next = [...landing.popular_routes]; next[i] = { ...next[i], from: e.target.value }; setLanding({ ...landing, popular_routes: next }); }} placeholder="From" className="rounded-md border border-input bg-background px-2 py-1.5 text-sm" />
+                <input value={r.to} onChange={(e) => { const next = [...landing.popular_routes]; next[i] = { ...next[i], to: e.target.value }; setLanding({ ...landing, popular_routes: next }); }} placeholder="To" className="rounded-md border border-input bg-background px-2 py-1.5 text-sm" />
+                <input value={r.price} onChange={(e) => { const next = [...landing.popular_routes]; next[i] = { ...next[i], price: e.target.value }; setLanding({ ...landing, popular_routes: next }); }} placeholder="₹4,500" className="rounded-md border border-input bg-background px-2 py-1.5 text-sm" />
+                <button type="button" onClick={() => setLanding({ ...landing, popular_routes: landing.popular_routes.filter((_, j) => j !== i) })} className="text-destructive text-xs font-semibold px-2">×</button>
+              </div>
+              <ImageUpload
+                value={r.image || ""}
+                onChange={(url) => { const next = [...landing.popular_routes]; next[i] = { ...next[i], image: url }; setLanding({ ...landing, popular_routes: next }); }}
+                folder="routes"
+                className="aspect-video max-w-[200px]"
+              />
             </div>
           ))}
         </div>
