@@ -1,15 +1,38 @@
 import { Link } from "@tanstack/react-router";
 import { Phone, Mail, MapPin, MessageCircle } from "lucide-react";
 import { whatsappLink } from "@/lib/whatsapp";
+import { useSiteSetting } from "@/hooks/useSiteSetting";
 
 export function Footer() {
+  const { value: logo } = useSiteSetting("logo", { logo_url: "", logo_text: "MNM Travels", use_image: false });
+
   return (
     <footer className="bg-primary text-primary-foreground mt-20">
       <div className="container mx-auto px-4 py-14 grid md:grid-cols-4 gap-10">
         <div>
           <div className="flex items-center gap-2 font-display text-2xl font-bold mb-4">
-            <span className="w-10 h-10 rounded-lg bg-gradient-gold text-secondary-foreground grid place-items-center">M</span>
-            MNM <span className="text-secondary">Travels</span>
+            {logo.use_image && logo.logo_url ? (
+              <img src={logo.logo_url} alt={logo.logo_text || "MNM Travels"} className="h-12 w-auto object-contain brightness-0 invert" />
+            ) : (
+              <>
+                <span className="w-10 h-10 rounded-lg bg-gradient-gold text-secondary-foreground grid place-items-center">
+                  {(logo.logo_text || "MNM Travels")[0]}
+                </span>
+                <span>
+                  {(() => {
+                    const parts = (logo.logo_text || "MNM Travels").split(" ");
+                    if (parts.length > 1) {
+                      return (
+                        <>
+                          {parts.slice(0, -1).join(" ")} <span className="text-secondary">{parts[parts.length - 1]}</span>
+                        </>
+                      );
+                    }
+                    return parts[0];
+                  })()}
+                </span>
+              </>
+            )}
           </div>
           <p className="text-sm text-primary-foreground/70">
             Premium vehicle rentals across India since 2014. Comfortable, safe, and reliable.

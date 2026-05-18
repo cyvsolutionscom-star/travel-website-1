@@ -121,6 +121,7 @@ const defaultLanding: LandingCfg = {
 };
 
 function AdminSettings() {
+  const [logo, setLogo] = useState({ logo_url: "", logo_text: "MNM Travels", use_image: false });
   const [contact, setContact] = useState<ContactCfg>({ phones: [], email: "", whatsapp: "", address: "", map_embed_url: "" });
   const [payment, setPayment] = useState<PaymentCfg>({ upi_id: "", qr_image: "", cod_enabled: true, note: "" });
   const [hero, setHero] = useState<HeroCfg>({ title: "", subtitle: "", tagline: "", images: [] });
@@ -136,6 +137,7 @@ function AdminSettings() {
         if (row.key === "payment") setPayment(row.value as PaymentCfg);
         if (row.key === "hero") setHero({ title: "", subtitle: "", tagline: "", images: [], ...(row.value as Partial<HeroCfg>) });
         if (row.key === "landing") setLanding({ ...defaultLanding, ...(row.value as Partial<LandingCfg>) });
+        if (row.key === "logo") setLogo({ logo_url: "", logo_text: "MNM Travels", use_image: false, ...(row.value as Partial<typeof logo>) });
       });
       setLoading(false);
     })();
@@ -152,6 +154,35 @@ function AdminSettings() {
   return (
     <div className="p-6 md:p-10 max-w-3xl">
       <h1 className="font-display text-3xl mb-8">Site Settings</h1>
+
+      <Section title="Logo & Brand Identity" saved={saved === "logo"} onSave={() => save("logo", logo)}>
+        <Field label="Brand / Logo Text" value={logo.logo_text} onChange={(v) => setLogo({ ...logo, logo_text: v })} />
+        <div className="pt-4 border-t border-border space-y-4">
+          <label className="flex items-center gap-2 text-sm font-semibold">
+            <input 
+              type="checkbox" 
+              checked={logo.use_image} 
+              onChange={(e) => setLogo({ ...logo, use_image: e.target.checked })} 
+              className="rounded border-input text-primary focus:ring-primary"
+            />
+            Use Image Logo instead of Text Logo
+          </label>
+          {logo.use_image && (
+            <div className="space-y-2">
+              <label className="text-xs font-medium text-muted-foreground">Logo Image</label>
+              <ImageUpload
+                value={logo.logo_url}
+                onChange={(url) => setLogo({ ...logo, logo_url: url })}
+                folder="logo"
+                className="aspect-[4/1] max-w-[320px] bg-muted/20"
+              />
+              <p className="text-xs text-muted-foreground">
+                Upload a transparent horizontal logo (PNG or SVG recommended, suggested aspect ratio 4:1).
+              </p>
+            </div>
+          )}
+        </div>
+      </Section>
 
       <Section title="Hero Section" saved={saved === "hero"} onSave={() => save("hero", hero)}>
         <Field label="Tagline" value={hero.tagline} onChange={(v) => setHero({ ...hero, tagline: v })} />

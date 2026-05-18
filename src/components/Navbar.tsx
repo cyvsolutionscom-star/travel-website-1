@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Menu, X, Phone } from "lucide-react";
 import { useState } from "react";
+import { useSiteSetting } from "@/hooks/useSiteSetting";
 
 const links = [
   { to: "/", label: "Home" },
@@ -13,12 +14,34 @@ const links = [
 
 export function Navbar() {
   const [open, setOpen] = useState(false);
+  const { value: logo } = useSiteSetting("logo", { logo_url: "", logo_text: "MNM Travels", use_image: false });
+
   return (
     <header className="sticky top-0 z-40 backdrop-blur-md bg-background/80 border-b border-border">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2 font-display text-xl font-bold">
-          <span className="w-9 h-9 rounded-lg bg-gradient-primary text-primary-foreground grid place-items-center shadow-elegant">M</span>
-          <span>MNM <span className="text-secondary">Travels</span></span>
+          {logo.use_image && logo.logo_url ? (
+            <img src={logo.logo_url} alt={logo.logo_text || "MNM Travels"} className="h-10 w-auto object-contain" />
+          ) : (
+            <>
+              <span className="w-9 h-9 rounded-lg bg-gradient-primary text-primary-foreground grid place-items-center shadow-elegant">
+                {(logo.logo_text || "MNM Travels")[0]}
+              </span>
+              <span>
+                {(() => {
+                  const parts = (logo.logo_text || "MNM Travels").split(" ");
+                  if (parts.length > 1) {
+                    return (
+                      <>
+                        {parts.slice(0, -1).join(" ")} <span className="text-secondary">{parts[parts.length - 1]}</span>
+                      </>
+                    );
+                  }
+                  return parts[0];
+                })()}
+              </span>
+            </>
+          )}
         </Link>
         <nav className="hidden md:flex items-center gap-1">
           {links.map((l) => (
