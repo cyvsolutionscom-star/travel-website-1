@@ -18,7 +18,7 @@ export const DEFAULT_VEHICLES: Vehicle[] = [
     seater: 4,
     daily_rent: 1300,
     per_km_rate: "₹12/km",
-    image_url: null,
+    image_url: "/v-zest.jpg",
     description: "Comfortable sedan ideal for city tours and small family trips.",
   },
   {
@@ -27,7 +27,7 @@ export const DEFAULT_VEHICLES: Vehicle[] = [
     seater: 7,
     daily_rent: 1800,
     per_km_rate: "₹8/km",
-    image_url: null,
+    image_url: "/v-innova.jpg",
     description: "Premium 7-seater SUV for family and group travel.",
   },
   {
@@ -36,7 +36,7 @@ export const DEFAULT_VEHICLES: Vehicle[] = [
     seater: 12,
     daily_rent: 3000,
     per_km_rate: "₹8/km",
-    image_url: null,
+    image_url: "/v-tempo.jpg",
     description: "Spacious 12-seater for medium groups and pilgrimages.",
   },
   {
@@ -45,7 +45,7 @@ export const DEFAULT_VEHICLES: Vehicle[] = [
     seater: 10,
     daily_rent: 3000,
     per_km_rate: "₹8/km",
-    image_url: null,
+    image_url: "/v-tempo.jpg",
     description: "10-seater tempo traveller for comfortable group travel.",
   },
   {
@@ -54,7 +54,7 @@ export const DEFAULT_VEHICLES: Vehicle[] = [
     seater: 17,
     daily_rent: 3600,
     per_km_rate: "₹6/km",
-    image_url: null,
+    image_url: "/v-tempo.jpg",
     description: "Large 17-seater for big family groups and tours.",
   },
   {
@@ -63,7 +63,7 @@ export const DEFAULT_VEHICLES: Vehicle[] = [
     seater: 17,
     daily_rent: 3600,
     per_km_rate: "₹6/km",
-    image_url: null,
+    image_url: "/v-tempo.jpg",
     description: "Premium 17-seater with reclining seats.",
   },
 ];
