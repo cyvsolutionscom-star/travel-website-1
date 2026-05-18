@@ -1,6 +1,6 @@
 import { createFileRoute, useLocation, useNavigate, useRouter, Link, Outlet } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { LayoutDashboard, Car, Calendar, Settings, LogOut, Loader2, Copy, Check, RefreshCw } from "lucide-react";
+import { LayoutDashboard, Car, Calendar, Settings, LogOut, Loader2, Copy, Check, RefreshCw, Shield } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/admin")({
@@ -218,6 +218,7 @@ function AdminLayout() {
           <NavItem to="/admin/bookings" icon={Calendar} label="Bookings" />
           <NavItem to="/admin/vehicles" icon={Car} label="Vehicles" />
           <NavItem to="/admin/settings" icon={Settings} label="Settings" />
+          <NavItem to="/admin/admins" icon={Shield} label="Admins" />
         </nav>
         <div className="p-3 border-t border-primary-foreground/10">
           <div className="px-3 py-2 text-xs text-primary-foreground/60 truncate">{email}</div>

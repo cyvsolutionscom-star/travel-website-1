@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState, FormEvent, useEffect } from "react";
 import { Loader2, Lock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { formatAuthError, getSupabaseConfigError } from "@/lib/supabase-auth";
 
 export const Route = createFileRoute("/admin/login")({
   head: () => ({
@@ -19,34 +20,62 @@ function AdminLogin() {
   const [msg, setMsg] = useState("");
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate({ to: "/admin" });
-    });
+    const configError = getSupabaseConfigError();
+    if (configError) {
+      setMsg(configError);
+      return;
+    }
+    supabase.auth
+      .getSession()
+      .then(({ data }) => {
+        if (data.session) navigate({ to: "/admin" });
+      })
+      .catch((err) => setMsg(formatAuthError(err)));
   }, [navigate]);
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
     setLoading(true);
     setMsg("");
-    if (mode === "signup") {
-      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-        email,
-        password,
-        options: { emailRedirectTo: window.location.origin + "/admin" },
-      });
-      if (signUpError) {
-        setLoading(false);
-        return setMsg(signUpError.message);
-      }
+
+    const configError = getSupabaseConfigError();
+    if (configError) {
       setLoading(false);
-      if (signUpData.session) navigate({ to: "/admin" });
-      else setMsg("Account created. Please verify your email, then sign in to see your user ID.");
-      return;
+      return setMsg(configError);
     }
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    setLoading(false);
-    if (error) return setMsg(error.message);
-    navigate({ to: "/admin" });
+
+    try {
+      if (mode === "signup") {
+        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+          email: email.trim(),
+          password,
+          options: { emailRedirectTo: window.location.origin + "/admin" },
+        });
+        if (signUpError) {
+          setLoading(false);
+          return setMsg(signUpError.message);
+        }
+        setLoading(false);
+        if (signUpData.session) navigate({ to: "/admin" });
+        else {
+          setMsg(
+            "Account created. If email confirmation is enabled, check your inbox. The first account automatically receives admin access.",
+          );
+        }
+        return;
+      }
+
+      const { error } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password,
+      });
+      setLoading(false);
+      if (error) return setMsg(error.message);
+      navigate({ to: "/admin" });
+    } catch (err) {
+      setLoading(false);
+      setMsg(formatAuthError(err));
+    }
   }
 
   return (
