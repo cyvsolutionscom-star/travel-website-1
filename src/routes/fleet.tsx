@@ -2,8 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Users, Fuel, MessageCircle, Loader2 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 import { whatsappLink, bookingMessage } from "@/lib/whatsapp";
+import { fetchActiveVehicles, type Vehicle } from "@/lib/vehicles";
 
 export const Route = createFileRoute("/fleet")({
   head: () => ({
@@ -17,30 +17,22 @@ export const Route = createFileRoute("/fleet")({
   component: FleetPage,
 });
 
-type Vehicle = {
-  id: string;
-  name: string;
-  seater: number;
-  daily_rent: number;
-  per_km_rate: string | null;
-  image_url: string | null;
-  description: string | null;
-};
-
 function FleetPage() {
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [loading, setLoading] = useState(true);
+  const [offline, setOffline] = useState(false);
 
   useEffect(() => {
-    supabase
-      .from("vehicles")
-      .select("id,name,seater,daily_rent,per_km_rate,image_url,description")
-      .eq("active", true)
-      .order("display_order")
-      .then(({ data }) => {
-        setVehicles(data ?? []);
-        setLoading(false);
-      });
+    let active = true;
+    void fetchActiveVehicles().then(({ vehicles: list, fromFallback }) => {
+      if (!active) return;
+      setVehicles(list);
+      setOffline(fromFallback);
+      setLoading(false);
+    });
+    return () => {
+      active = false;
+    };
   }, []);
 
   return (
@@ -50,6 +42,12 @@ function FleetPage() {
         <h1 className="font-display text-4xl md:text-5xl mt-2">Choose Your Perfect Vehicle</h1>
         <p className="mt-4 text-muted-foreground">Transparent pricing with no hidden charges. From compact sedans to spacious tempo travellers.</p>
       </div>
+
+      {offline && !loading && (
+        <p className="mb-8 text-sm text-amber-800 dark:text-amber-200 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900 rounded-xl px-4 py-3 text-center max-w-2xl mx-auto">
+          Showing default fleet. Connect Supabase to sync vehicles from the admin dashboard.
+        </p>
+      )}
 
       {loading ? (
         <div className="flex justify-center py-20"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>

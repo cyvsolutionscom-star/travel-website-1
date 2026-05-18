@@ -5,9 +5,9 @@ import { ArrowRight, Shield, Clock, Users, Star, CheckCircle2, MessageCircle, Ph
 import hero1 from "@/assets/hero-1.jpg";
 import hero2 from "@/assets/hero-2.jpg";
 import hero3 from "@/assets/hero-3.jpg";
-import { supabase } from "@/integrations/supabase/client";
 import { bookingMessage, whatsappLink } from "@/lib/whatsapp";
 import { useSiteSetting } from "@/hooks/useSiteSetting";
+import { fetchActiveVehicles, type Vehicle } from "@/lib/vehicles";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -22,16 +22,6 @@ export const Route = createFileRoute("/")({
 });
 
 const heroes = [hero1, hero2, hero3];
-
-type Vehicle = {
-  id: string;
-  name: string;
-  seater: number;
-  daily_rent: number;
-  per_km_rate: string | null;
-  image_url: string | null;
-  description: string | null;
-};
 
 type StatItem = { n: string; l: string };
 type ServiceItem = { t: string; d: string };
@@ -146,6 +136,7 @@ function HomePage() {
   const [idx, setIdx] = useState(0);
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [fleetLoading, setFleetLoading] = useState(true);
+  const [fleetOffline, setFleetOffline] = useState(false);
   const { value: landing } = useSiteSetting<LandingCfg>("landing", defaultLanding);
 
   useEffect(() => {
@@ -154,16 +145,16 @@ function HomePage() {
   }, []);
 
   useEffect(() => {
-    supabase
-      .from("vehicles")
-      .select("id,name,seater,daily_rent,per_km_rate,image_url,description")
-      .eq("active", true)
-      .order("display_order", { ascending: true })
-      .limit(6)
-      .then(({ data }) => {
-        setVehicles(data ?? []);
-        setFleetLoading(false);
-      });
+    let active = true;
+    void fetchActiveVehicles(6).then(({ vehicles: list, fromFallback }) => {
+      if (!active) return;
+      setVehicles(list);
+      setFleetOffline(fromFallback);
+      setFleetLoading(false);
+    });
+    return () => {
+      active = false;
+    };
   }, []);
 
   return (
@@ -264,6 +255,12 @@ function HomePage() {
             </Link>
           </div>
         </div>
+
+        {fleetOffline && !fleetLoading && (
+          <p className="mb-6 text-sm text-amber-800 dark:text-amber-200 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900 rounded-xl px-4 py-3">
+            Showing default fleet prices. Connect Supabase in Vercel to load live vehicles from the admin dashboard.
+          </p>
+        )}
 
         {fleetLoading ? (
           <div className="py-16 grid place-items-center">

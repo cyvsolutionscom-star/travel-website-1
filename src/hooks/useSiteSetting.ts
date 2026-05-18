@@ -12,10 +12,13 @@ export function useSiteSetting<T>(key: string, fallback: T): { value: T; loading
       .select("value")
       .eq("key", key)
       .maybeSingle()
-      .then(({ data }) => {
+      .then(({ data, error }) => {
         if (!active) return;
-        if (data?.value) setValue(data.value as T);
+        if (!error && data?.value) setValue(data.value as T);
         setLoading(false);
+      })
+      .catch(() => {
+        if (active) setLoading(false);
       });
     return () => {
       active = false;
