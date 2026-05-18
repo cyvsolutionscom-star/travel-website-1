@@ -2,7 +2,12 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState, FormEvent, useEffect } from "react";
 import { Loader2, Lock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { formatAuthError, getSupabaseConfigError } from "@/lib/supabase-auth";
+import {
+  checkSupabaseConnection,
+  formatAuthError,
+  getSupabaseConfigError,
+  type SupabaseConnectionStatus,
+} from "@/lib/supabase-auth";
 
 export const Route = createFileRoute("/admin/login")({
   head: () => ({
@@ -18,19 +23,45 @@ function AdminLogin() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState("");
+  const [connection, setConnection] = useState<SupabaseConnectionStatus | null>(null);
+  const [checkingConnection, setCheckingConnection] = useState(true);
 
   useEffect(() => {
-    const configError = getSupabaseConfigError();
-    if (configError) {
-      setMsg(configError);
-      return;
-    }
-    supabase.auth
-      .getSession()
-      .then(({ data }) => {
+    let mounted = true;
+
+    async function init() {
+      setCheckingConnection(true);
+      const configError = getSupabaseConfigError();
+      if (configError) {
+        if (mounted) {
+          setMsg(configError);
+          setConnection({ ok: false, message: configError });
+          setCheckingConnection(false);
+        }
+        return;
+      }
+
+      const status = await checkSupabaseConnection();
+      if (!mounted) return;
+      setConnection(status);
+      setCheckingConnection(false);
+      if (!status.ok) {
+        setMsg(status.message);
+        return;
+      }
+
+      try {
+        const { data } = await supabase.auth.getSession();
         if (data.session) navigate({ to: "/admin" });
-      })
-      .catch((err) => setMsg(formatAuthError(err)));
+      } catch (err) {
+        setMsg(formatAuthError(err));
+      }
+    }
+
+    void init();
+    return () => {
+      mounted = false;
+    };
   }, [navigate]);
 
   async function onSubmit(e: FormEvent) {
@@ -42,6 +73,13 @@ function AdminLogin() {
     if (configError) {
       setLoading(false);
       return setMsg(configError);
+    }
+
+    const conn = await checkSupabaseConnection();
+    if (!conn.ok) {
+      setConnection(conn);
+      setLoading(false);
+      return setMsg(conn.message);
     }
 
     try {
@@ -100,8 +138,22 @@ function AdminLogin() {
             <label className="text-sm font-medium">Password</label>
             <input type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} className="mt-1.5 w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm" />
           </div>
+          {checkingConnection && (
+            <p className="text-xs text-muted-foreground flex items-center gap-2">
+              <Loader2 className="w-3.5 h-3.5 animate-spin" /> Checking Supabase connection…
+            </p>
+          )}
+          {!checkingConnection && connection?.ok && (
+            <p className="text-xs text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-950/50 p-2 rounded-lg">
+              Supabase connected{connection.projectHost ? ` (${connection.projectHost})` : ""}.
+            </p>
+          )}
           {msg && <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-lg">{msg}</div>}
-          <button type="submit" disabled={loading} className="w-full inline-flex items-center justify-center gap-2 bg-gradient-primary text-primary-foreground py-3 rounded-full font-bold shadow-elegant hover:scale-[1.02] transition-smooth disabled:opacity-60">
+          <button
+            type="submit"
+            disabled={loading || checkingConnection || connection?.ok === false}
+            className="w-full inline-flex items-center justify-center gap-2 bg-gradient-primary text-primary-foreground py-3 rounded-full font-bold shadow-elegant hover:scale-[1.02] transition-smooth disabled:opacity-60"
+          >
             {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
             {mode === "login" ? "Sign In" : "Create Admin Account"}
           </button>

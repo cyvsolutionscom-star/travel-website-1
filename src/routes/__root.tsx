@@ -1,6 +1,7 @@
 import { Outlet, createRootRoute, HeadContent, Scripts, useLocation } from "@tanstack/react-router";
 import appCss from "../styles.css?url";
 import { SiteLayout } from "@/components/SiteLayout";
+import { SupabaseRuntimeConfig } from "@/components/SupabaseRuntimeConfig";
 
 function NotFoundComponent() {
   return (
@@ -39,7 +40,11 @@ function RootShell({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <head><HeadContent /></head>
-      <body>{children}<Scripts /></body>
+      <body>
+        <SupabaseRuntimeConfig />
+        {children}
+        <Scripts />
+      </body>
     </html>
   );
 }

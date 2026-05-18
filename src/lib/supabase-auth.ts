@@ -1,12 +1,60 @@
 import { supabase } from "@/integrations/supabase/client";
+import { getSupabaseConfigError, getSupabasePublicConfig } from "@/lib/supabase-config";
 
-export function getSupabaseConfigError(): string | null {
-  const url = import.meta.env.VITE_SUPABASE_URL;
-  const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
-  if (!url || !key) {
-    return "Supabase is not configured. Add VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY in your hosting environment (e.g. Vercel), then redeploy.";
+export { getSupabaseConfigError };
+
+export type SupabaseConnectionStatus = {
+  ok: boolean;
+  message: string;
+  projectHost?: string;
+};
+
+/** Probe Supabase before login — surfaces paused/deleted projects clearly. */
+export async function checkSupabaseConnection(): Promise<SupabaseConnectionStatus> {
+  const config = getSupabasePublicConfig();
+  if (!config) {
+    return { ok: false, message: getSupabaseConfigError() ?? "Supabase is not configured." };
   }
-  return null;
+
+  const projectHost = new URL(config.url).hostname;
+
+  try {
+    const res = await fetch(`${config.url}/auth/v1/health`, {
+      headers: { apikey: config.anonKey },
+    });
+
+    if (res.ok) {
+      return { ok: true, message: "Connected to Supabase.", projectHost };
+    }
+
+    if (res.status === 503 || res.status === 502) {
+      return {
+        ok: false,
+        projectHost,
+        message: `Supabase project "${projectHost}" is paused or unavailable. Open supabase.com/dashboard → your project → Restore / Unpause, then try again.`,
+      };
+    }
+
+    return {
+      ok: false,
+      projectHost,
+      message: `Supabase returned HTTP ${res.status}. Check the project URL in environment variables.`,
+    };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    if (
+      message === "Failed to fetch" ||
+      message.includes("NetworkError") ||
+      message.includes("ERR_NAME_NOT_RESOLVED")
+    ) {
+      return {
+        ok: false,
+        projectHost,
+        message: `Cannot reach "${projectHost}". The Supabase project may be deleted, paused, or the URL in .env / Vercel is wrong. Create or restore a project at supabase.com and update VITE_SUPABASE_URL.`,
+      };
+    }
+    return { ok: false, projectHost, message: formatAuthError(err) };
+  }
 }
 
 export function formatAuthError(error: unknown): string {
@@ -19,7 +67,10 @@ export function formatAuthError(error: unknown): string {
     message.includes("NetworkError") ||
     message.includes("fetch failed")
   ) {
-    return "Could not reach Supabase. Check your internet connection, confirm the Supabase project exists, and verify VITE_SUPABASE_URL is correct in environment variables.";
+    const host = getSupabasePublicConfig()?.url
+      ? new URL(getSupabasePublicConfig()!.url).hostname
+      : "your Supabase host";
+    return `Could not reach Supabase (${host}). The project may be paused or deleted — open supabase.com/dashboard, restore the project, and confirm VITE_SUPABASE_URL in Vercel matches Project Settings → API.`;
   }
 
   if (message) return message;
