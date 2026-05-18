@@ -5,5 +5,10 @@
 //     error logger plugins, and sandbox detection (port/host/strictPort).
 // You can pass additional config via defineConfig({ vite: { ... } }) if needed.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
+import { nitro } from "nitro/vite";
 
-export default defineConfig();
+export default defineConfig({
+  // Cloudflare Workers output breaks on Vercel; Nitro targets Vercel Functions.
+  cloudflare: false,
+  plugins: [nitro({ preset: "vercel" })],
+});
